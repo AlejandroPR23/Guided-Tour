@@ -1,0 +1,229 @@
+/**
+ * guided_tour.css — Driver.js + Drupal 11
+ *
+ * Driver.js genera clases .driver-popover, .driver-overlay, etc.
+ * Las sobreescribimos con prefijo .guided-tour__ para no colisionar con Tailwind.
+ * La clase base .guided-tour__popover se pasa en popoverClass al crear el driver.
+ */
+
+/* ── Variables ───────────────────────────────────────────────────────────── */
+:root {
+  --gt-primary:       #0060A8;
+  --gt-primary-hover: #004d8a;
+  --gt-text:          #1a1a1a;
+  --gt-text-muted:    #5f6b7c;
+  --gt-bg:            #ffffff;
+  --gt-border:        #e2e8f0;
+  --gt-radius:        12px;
+  --gt-shadow:        0 8px 32px rgba(0, 0, 0, 0.18);
+  --gt-z:             99999;
+}
+
+/* ── Popover contenedor ──────────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover {
+  background:    var(--gt-bg) !important;
+  border:        1px solid var(--gt-border) !important;
+  border-radius: var(--gt-radius) !important;
+  box-shadow:    var(--gt-shadow) !important;
+  padding:       0 !important;
+  max-width:     380px !important;
+  min-width:     280px !important;
+  z-index:       var(--gt-z) !important;
+  /* Reseteo de posibles clases Tailwind que filtren al popover */
+  font-family:   inherit !important;
+  font-size:     14px !important;
+  line-height:   1.6 !important;
+  color:         var(--gt-text) !important;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-title {
+  font-size:     15px !important;
+  font-weight:   600 !important;
+  color:         var(--gt-text) !important;
+  padding:       18px 18px 0 !important;
+  margin:        0 0 6px !important;
+  line-height:   1.4 !important;
+  display:       block !important;
+}
+
+/* ── Descripción ─────────────────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-description {
+  font-size:   14px !important;
+  color:       var(--gt-text-muted) !important;
+  padding:     0 18px 14px !important;
+  margin:      0 !important;
+  line-height: 1.6 !important;
+}
+
+/* ── Footer con botones y progreso ───────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-footer {
+  display:         flex !important;
+  align-items:     center !important;
+  justify-content: space-between !important;
+  padding:         0 18px 16px !important;
+  gap:             8px !important;
+  border-top:      none !important;
+}
+
+/* ── Progreso (Paso X de N) ──────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-progress-text {
+  font-size:   12px !important;
+  color:       var(--gt-text-muted) !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── Grupo de botones prev/next ──────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-navigation-btns {
+  display: flex !important;
+  gap:     6px !important;
+}
+
+/* ── Botones base ────────────────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-prev-btn,
+.driver-popover.guided-tour__popover .driver-popover-next-btn {
+  display:         inline-flex !important;
+  align-items:     center !important;
+  border-radius:   8px !important;
+  font-size:       13px !important;
+  font-weight:     500 !important;
+  padding:         7px 14px !important;
+  cursor:          pointer !important;
+  border:          none !important;
+  transition:      background 0.15s ease, color 0.15s ease !important;
+  text-decoration: none !important;
+  white-space:     nowrap !important;
+  outline:         none !important;
+}
+
+/* Botón Anterior */
+.driver-popover.guided-tour__popover .driver-popover-prev-btn {
+  background: #f1f5f9 !important;
+  color:      var(--gt-text) !important;
+}
+.driver-popover.guided-tour__popover .driver-popover-prev-btn:hover {
+  background: #e2e8f0 !important;
+}
+
+/* Botón Siguiente / Listo */
+.driver-popover.guided-tour__popover .driver-popover-next-btn {
+  background: var(--gt-primary) !important;
+  color:      #ffffff !important;
+}
+.driver-popover.guided-tour__popover .driver-popover-next-btn:hover {
+  background: var(--gt-primary-hover) !important;
+}
+
+/* ── Botón de cierre (X) ─────────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-close-btn {
+  position:   absolute !important;
+  top:        12px !important;
+  right:      12px !important;
+  background: transparent !important;
+  border:     none !important;
+  color:      var(--gt-text-muted) !important;
+  cursor:     pointer !important;
+  font-size:  18px !important;
+  padding:    0 !important;
+  line-height: 1 !important;
+  transition: color 0.2s ease !important;
+}
+.driver-popover.guided-tour__popover .driver-popover-close-btn:hover {
+  color: var(--gt-text) !important;
+}
+
+/* ── Flecha del popover ──────────────────────────────────────────────────── */
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-top::after,
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-bottom::after,
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-left::after,
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-right::after {
+  border-color: var(--gt-bg) transparent transparent transparent !important;
+}
+
+/* ── Overlay de Driver.js ────────────────────────────────────────────────── */
+.driver-overlay {
+  z-index: calc(var(--gt-z) - 1) !important;
+}
+
+/* ── Highlight del elemento activo ──────────────────────────────────────── */
+.driver-active-element {
+  /* Driver.js añade un ring al elemento activo */
+  outline:        2px solid var(--gt-primary) !important;
+  outline-offset: 4px !important;
+  border-radius:  4px !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .driver-popover.guided-tour__popover {
+    max-width: calc(100vw - 24px) !important;
+    min-width: auto !important;
+  }
+}
+
+/* ── Botón de replay (TourTriggerBlock) ──────────────────────────────────── */
+
+/* Estilo: botón primario */
+.guided-tour-trigger--button .guided-tour-trigger__btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: var(--gt-primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 18px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease !important;
+}
+.guided-tour-trigger--button .guided-tour-trigger__btn:hover {
+  background: var(--gt-primary-hover) !important;
+}
+
+/* Estilo: enlace */
+.guided-tour-trigger--link .guided-tour-trigger__btn {
+  background: none !important;
+  border: none !important;
+  color: var(--gt-primary) !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  padding: 0 !important;
+}
+
+/* Estilo: FAB (botón flotante en esquina inferior derecha) */
+.guided-tour-trigger--fab {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 9990 !important;
+}
+.guided-tour-trigger--fab .guided-tour-trigger__btn {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  background: var(--gt-primary) !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 22px !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 0.15s ease, transform 0.15s ease !important;
+}
+.guided-tour-trigger--fab .guided-tour-trigger__btn:hover {
+  background: var(--gt-primary-hover) !important;
+  transform: scale(1.08) !important;
+}
+.guided-tour-trigger--fab .guided-tour-trigger__label {
+  display: none !important; /* FAB solo muestra el icono */
+}
+
+.guided-tour-trigger__icon {
+  font-style: normal !important;
+  font-weight: 700 !important;
+}

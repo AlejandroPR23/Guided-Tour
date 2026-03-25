@@ -1,0 +1,6 @@
+services:
+  guided_tour.tour_manager:
+    class: Drupal\guided_tour\Service\TourManager
+    arguments:
+      - '@entity_type.manager'
+      - '@current_route_match'

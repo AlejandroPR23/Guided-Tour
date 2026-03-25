@@ -1,0 +1,31 @@
+entity.guided_tour.collection:
+  path: '/admin/config/user-interface/guided-tour'
+  defaults:
+    _entity_list: 'guided_tour'
+    _title: 'Tours guiados'
+  requirements:
+    _permission: 'administer guided tours'
+
+entity.guided_tour.add_form:
+  path: '/admin/config/user-interface/guided-tour/add'
+  defaults:
+    _entity_form: 'guided_tour.add'
+    _title: 'Agregar tour guiado'
+  requirements:
+    _permission: 'administer guided tours'
+
+entity.guided_tour.edit_form:
+  path: '/admin/config/user-interface/guided-tour/{guided_tour}/edit'
+  defaults:
+    _entity_form: 'guided_tour.edit'
+    _title: 'Editar tour guiado'
+  requirements:
+    _permission: 'administer guided tours'
+
+entity.guided_tour.delete_form:
+  path: '/admin/config/user-interface/guided-tour/{guided_tour}/delete'
+  defaults:
+    _entity_form: 'guided_tour.delete'
+    _title: 'Eliminar tour guiado'
+  requirements:
+    _permission: 'administer guided tours'

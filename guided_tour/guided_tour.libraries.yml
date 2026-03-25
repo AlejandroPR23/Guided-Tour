@@ -1,0 +1,29 @@
+shepherd:
+  remote: https://shepherd.js.org
+  version: "8.3.1"
+  license:
+    name: MIT
+    url: https://github.com/shepherd-js/shepherd/blob/main/LICENSE
+    gpl-compatible: true
+  js:
+    https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js:
+      type: external
+      minified: true
+  css:
+    theme:
+      https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css:
+        type: external
+        minified: true
+
+guided_tour:
+  version: 1.x
+  js:
+    js/guided_tour.js: {}
+  css:
+    theme:
+      css/guided_tour.css: {}
+  dependencies:
+    - guided_tour/shepherd
+    - core/drupal
+    - core/drupalSettings
+    - core/once

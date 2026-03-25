@@ -1,0 +1,7 @@
+# guided_tour.links.menu.yml
+guided_tour.admin:
+  title: 'Tours guiados'
+  description: 'Gestiona los tours guiados del sitio.'
+  parent: system.admin_config_ui
+  route_name: entity.guided_tour.collection
+  weight: 10

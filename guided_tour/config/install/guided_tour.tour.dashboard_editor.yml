@@ -1,0 +1,69 @@
+id: dashboard_editor
+label: 'Tour de dashboard - Rol Editor'
+status: true
+
+routes:
+  - 'view.dashboard.page_1'
+  - 'system.admin_content'
+
+roles:
+  - editor
+  - content_manager
+
+cookie_days: 180
+
+wait_for_wc: true
+
+options:
+  defaultStepOptions:
+    scrollTo: true
+    cancelIcon:
+      enabled: true
+  useModalOverlay: true
+
+steps:
+  -
+    id: step-editor-welcome
+    attachTo:
+      element: '[data-tour="admin-toolbar"]'
+      on: bottom
+    title: 'Panel de edición'
+    text: 'Como editor, tienes acceso a herramientas especiales para gestionar contenido.'
+    buttons:
+      -
+        text: 'Comenzar'
+        type: next
+      -
+        text: 'Ya lo sé'
+        type: cancel
+        secondary: true
+
+  -
+    id: step-content-list
+    attachTo:
+      element: '[data-tour="content-list"]'
+      on: right
+    title: 'Lista de contenido'
+    text: 'Aquí puedes ver, editar y publicar todo el contenido del sitio.'
+    buttons:
+      -
+        text: 'Anterior'
+        type: back
+      -
+        text: 'Siguiente'
+        type: next
+
+  -
+    id: step-create-content
+    attachTo:
+      element: '[data-tour="create-content-btn"]'
+      on: left
+    title: 'Crear contenido'
+    text: 'Pulsa este botón para crear un nuevo artículo o página.'
+    buttons:
+      -
+        text: 'Anterior'
+        type: back
+      -
+        text: '¡Listo!'
+        type: next

@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Módulo para tours guiados con Shepherd.js.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function guided_tour_help(string $route_name, RouteMatchInterface $route_match): string { //phpcs:ignore
+  return match($route_name) {
+    'help.page.guided_tour' =>
+    '<p>' . t('Tours guiados con Shepherd.js.
+    Gestiona los tours en <a href=":url">
+    Configuración > Interfaz de usuario > Tours guiados</a>.', [
+      ':url' => '/admin/config/user-interface/guided-tour',
+    ]) . '</p>',
+    default => '',
+  };
+}
+
+/**
+ * Implements hook_permission().
+ */
+function guided_tour_permission(): array {
+  return [
+    'administer guided tours' => [
+      'title'           => t('Administrar tours guiados'),
+      'description'     => t('Crear, editar y eliminar tours.'),
+      'restrict access' => TRUE,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function guided_tour_page_attachments(array &$attachments): void {
+  /** @var \Drupal\guided_tour\Service\TourManager $manager */
+  $manager      = \Drupal::service('guided_tour.tour_manager');
+  $current_user = \Drupal::currentUser();
+  $route_name   = \Drupal::routeMatch()->getRouteName();
+
+  $tour = $manager->getTourForRouteAndUser($route_name, $current_user);
+  if ($tour === NULL) {
+    return;
+  }
+
+  $cookie_name = 'guided_tour_dismissed_' . $tour->id();
+  $dismissed   = \Drupal::request()->cookies->has($cookie_name);
+
+  $attachments['#attached']['library'][]                    = 'guided_tour/guided_tour';
+  $attachments['#attached']['drupalSettings']['guidedTour'] = [
+    'tourId'      => $tour->id(),
+    'steps'       => $tour->getSteps(),
+    'options'     => $tour->getOptions(),
+    'userRole'    => _guided_tour_get_primary_role($current_user),
+    'isAnonymous' => $current_user->isAnonymous(),
+    'cookieName'  => $cookie_name,
+    'cookieDays'  => $tour->getCookieDays(),
+    'waitForWC'   => $tour->isWaitForWc(),
+    'autoPlay'    => !$dismissed,
+  ];
+}
+
+/**
+ * Devuelve el rol más relevante del usuario.
+ */
+function _guided_tour_get_primary_role(AccountInterface $account): string {
+  if ($account->isAnonymous()) {
+    return 'anonymous';
+  }
+  $priority   = ['administrator', 'editor', 'content_manager', 'authenticated'];
+  $user_roles = $account->getRoles();
+  foreach ($priority as $role) {
+    if (in_array($role, $user_roles, TRUE)) {
+      return $role;
+    }
+  }
+  return 'authenticated';
+}
