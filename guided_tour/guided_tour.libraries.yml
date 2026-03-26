@@ -1,18 +1,15 @@
 driverjs:
-  remote: https://driverjs.com
   version: "1"
   license:
     name: MIT
     url: https://github.com/kamranahmedse/driver.js/blob/master/LICENSE
     gpl-compatible: true
   js:
-    https://cdn.jsdelivr.net/npm/driver.js@1/dist/driver.js.iife.js:
-      type: external
+    js/dist/vendor.js:
       minified: true
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/driver.js@1/dist/driver.css:
-        type: external
+      js/dist/guided_tour.css:
         minified: true
 
 guided_tour:

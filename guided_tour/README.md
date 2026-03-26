@@ -1,86 +1,236 @@
-# Guided Tour para Drupal 11
-## Dos enfoques: Custom Shepherd.js vs Tour contrib 2.x
+# Guided Tour
+
+Provides guided tours using [Driver.js](https://driverjs.com) for Drupal 10 and 11.
+Tours work for **anonymous and authenticated users**, support **role-based targeting**,
+and are fully compatible with **Web Components** (Storybook / Lit / Tailwind).
 
 ---
 
-## ENFOQUE A — Módulo custom con Shepherd.js (RECOMENDADO)
+## Features
 
-### Instalación
+- Role-based tours (anonymous, editor, administrator, or any custom role)
+- Compatible with Web Components — waits for custom elements to upgrade before starting
+- Cookie-based dismissal (configurable days per tour)
+- Replay button block (primary button, link, or FAB styles)
+- YAML-based tour configuration (importable via `drush config:import`)
+- Admin UI to create and manage tours without code
+- Custom JS events (`guidedTour:complete`, `guidedTour:cancel`) for analytics integration
+- Compatible with Tailwind CSS (scoped CSS variables, no conflicts)
+
+---
+
+## Requirements
+
+- Drupal 10.x or 11.x
+- PHP 8.1+
+- Composer
+- The [asset-packagist](https://asset-packagist.org) repository configured in your project
+
+---
+
+## Installation
+
+### Step 1 — Configure asset-packagist in your project root
+
+Open your **project root** `composer.json` (not this module's) and add two blocks.
+
+#### 1a. Add the asset-packagist repository
+
+```json
+"repositories": [
+    {
+        "type": "composer",
+        "url": "https://asset-packagist.org"
+    }
+]
+```
+
+#### 1b. Add the installer path for npm assets
+
+Inside `"extra"` → `"installer-paths"`, add this entry so Driver.js lands in `web/libraries/`:
+
+```json
+"extra": {
+    "installer-types": ["npm-asset", "bower-asset"],
+    "installer-paths": {
+        "web/libraries/{$name}": [
+            "type:npm-asset",
+            "type:bower-asset"
+        ]
+    }
+}
+```
+
+> If you already have `"installer-paths"` configured, just add the `"web/libraries/{$name}"` entry — do not duplicate the whole block.
+
+#### 1c. Require the oomphinc/composer-installers-extender plugin
+
+This plugin is needed for Composer to know how to handle `npm-asset` packages:
 
 ```bash
-# 1. Copiar el módulo a tu proyecto
-cp -r guided_tour /path/to/drupal/web/modules/custom/
+composer require oomphinc/composer-installers-extender
+```
 
-# 2. Habilitar
+---
+
+### Step 2 — Require the module
+
+```bash
+composer require drupal/guided_tour
+```
+
+Composer will automatically download Driver.js into `web/libraries/driver.js/`.
+
+---
+
+### Step 3 — Enable the module
+
+```bash
 drush pm:enable guided_tour
 drush cr
 ```
 
-### Añadir data-tour a tus Web Components (Storybook/Tailwind)
+---
 
-En tus Web Components, añade el atributo `data-tour` en el template del componente.
-Shepherd lo usa como selector CSS: `[data-tour="nombre"]`.
+## Verifying the installation
 
-**Ejemplo en un LitElement / Web Component:**
-```javascript
-// mi-header.component.js
-render() {
-  return html`
-    <header data-tour="main-header" class="...clases tailwind...">
-      ...
-    </header>
-  `;
-}
+After running Composer, confirm Driver.js was downloaded:
+
+```bash
+ls web/libraries/driver.js/dist/
+# Expected: driver.js.iife.js  driver.css  (plus other files)
 ```
 
-**Ejemplo en un componente Storybook:**
-```html
-<!-- En el template HTML del story -->
-<app-header data-tour="main-header"></app-header>
-<nav-menu data-tour="main-nav"></nav-menu>
-<search-bar data-tour="search-bar"></search-bar>
+If the folder is missing, run:
+
+```bash
+composer install
 ```
 
-### Crear un nuevo tour
+---
 
-Crea un archivo YAML en `config/install/` o impórtalo con Drush:
+## Creating tours
+
+### Option A — Admin UI
+
+1. Go to **Administration > Configuration > User Interface > Guided Tours**
+   (`/admin/config/user-interface/guided-tour`)
+2. Click **Add guided tour**
+3. Fill in the label, routes, roles, and steps
+4. Save
+
+### Option B — YAML configuration files
+
+Create a file in `config/install/` of your custom module:
 
 ```yaml
-# guided_tour.tour.mi_tour.yml
-id: mi_tour
-label: 'Mi tour personalizado'
+# my_module/config/install/guided_tour.tour.my_tour.yml
+id: my_tour
+label: 'My tour'
 status: true
 routes:
   - '<front>'
 roles:
   - anonymous
-  - authenticated
 cookie_days: 365
 wait_for_wc: true
 options:
   useModalOverlay: true
 steps:
   -
-    id: paso-1
+    id: step-welcome
     attachTo:
-      element: '[data-tour="mi-componente"]'
+      element: '[data-tour="main-header"]'
       on: bottom
-    title: 'Título del paso'
-    text: 'Descripción del paso.'
+    title: 'Welcome!'
+    text: 'This is the homepage.'
     buttons:
-      - { text: 'Siguiente', type: next }
-      - { text: 'Omitir', type: cancel, secondary: true }
+      - { text: 'Next', type: next }
+      - { text: 'Skip', type: cancel, secondary: true }
+  -
+    id: step-nav
+    attachTo:
+      element: '[data-tour="main-nav"]'
+      on: bottom
+    title: 'Navigation'
+    text: 'Use this menu to browse the site.'
+    buttons:
+      - { text: 'Back', type: back }
+      - { text: 'Got it!', type: next }
 ```
 
+Import it:
+
 ```bash
-drush config:import --partial --source=modules/custom/guided_tour/config/install
+drush config:import --partial --source=modules/custom/my_module/config/install
 drush cr
 ```
 
-### Limpiar cookie para re-ver el tour (desarrollo)
+---
+
+## Adding `data-tour` attributes to your components
+
+Shepherd uses CSS selectors to attach tour steps to elements.
+Add `data-tour` attributes to any element you want to highlight:
+
+```html
+<header data-tour="main-header">...</header>
+<nav data-tour="main-nav">...</nav>
+<input data-tour="search-bar" />
+```
+
+For **Web Components** (LitElement, etc.):
 
 ```javascript
-// En la consola del navegador:
+render() {
+  return html`
+    <header data-tour="main-header" class="...">
+      ...
+    </header>
+  `;
+}
+```
+
+---
+
+## Replay button block
+
+Place the **Guided Tour Button** block in any theme region:
+
+1. Go to **Structure > Block layout**
+2. Click **Place block** in the desired region
+3. Search for "Guided Tour Button"
+4. Configure label, style (`button`, `link`, or `fab`), and icon
+5. Save
+
+The block is hidden automatically on pages without an active tour.
+
+---
+
+## JavaScript events
+
+Listen to tour lifecycle events from any JS file or Web Component:
+
+```javascript
+document.addEventListener('guidedTour:complete', (e) => {
+  console.log('Tour completed:', e.detail.tourId, 'role:', e.detail.role);
+  // Example: send to GA4
+  gtag('event', 'tour_complete', { tour_id: e.detail.tourId });
+});
+
+document.addEventListener('guidedTour:cancel', (e) => {
+  console.log('Tour cancelled:', e.detail);
+});
+```
+
+---
+
+## Clearing the dismissal cookie (development)
+
+To re-trigger a tour that has already been dismissed:
+
+```javascript
+// Paste in browser console:
 document.cookie.split(';').forEach(c => {
   if (c.includes('guided_tour_')) {
     document.cookie = c.split('=')[0] + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -89,77 +239,66 @@ document.cookie.split(';').forEach(c => {
 location.reload();
 ```
 
-### Escuchar eventos del tour desde tus WC
+---
 
-```javascript
-// En cualquier Web Component o JS del sitio:
-document.addEventListener('guidedTour:complete', (e) => {
-  console.log('Tour completado:', e.detail.tourId, 'por rol:', e.detail.role);
-  // Aquí puedes, por ejemplo, hacer tracking con GA4 o Matomo.
-  gtag('event', 'tour_complete', { tour_id: e.detail.tourId });
-});
+## Configuration reference
 
-document.addEventListener('guidedTour:cancel', (e) => {
-  console.log('Tour cancelado:', e.detail);
-});
-```
+| Key            | Type    | Default | Description                                              |
+|----------------|---------|---------|----------------------------------------------------------|
+| `routes`       | list    | `[]`    | Drupal route names where the tour appears. Empty = all.  |
+| `route_params` | map     | `{}`    | Filter by specific route parameters (e.g. `node: 42`).  |
+| `roles`        | list    | `[]`    | Roles that see the tour. Empty = all roles.              |
+| `cookie_days`  | integer | `365`   | Days to remember dismissal. `0` = never remember.       |
+| `wait_for_wc`  | boolean | `true`  | Wait for Web Components to upgrade before starting.      |
+| `options`      | map     | —       | Driver.js global options (e.g. `useModalOverlay: true`). |
+| `steps`        | list    | `[]`    | Tour steps (see YAML example above).                     |
+
+### Step keys
+
+| Key        | Required | Description                                                     |
+|------------|----------|-----------------------------------------------------------------|
+| `id`       | Yes      | Unique step identifier.                                         |
+| `title`    | Yes      | Step popover title (translatable).                              |
+| `text`     | Yes      | Step popover body text (translatable).                          |
+| `attachTo` | No       | `element` (CSS selector) and `on` (top/right/bottom/left).     |
+| `buttons`  | No       | List of buttons with `text` and `type` (next/back/cancel).     |
 
 ---
 
-## ENFOQUE B — Tour contrib 2.x
+## Comparison with Tour contrib
 
-### Instalación
-
-```bash
-composer require drupal/tour
-drush pm:enable tour
-drush cr
-```
-
-### Usar la UI gráfica
-
-1. Ir a **Administración > Configuración > Interfaz de usuario > Tours**
-   (`/admin/config/user-interface/tour`)
-2. Crear un tour con el botón "Add tour"
-3. Definir la ruta donde aparece
-4. Añadir pasos con selector CSS
-5. Guardar — aparecerá el botón "Tour" en el toolbar de esa ruta
-
-### Crear tour via YAML (alternativa sin UI)
-
-Ver archivo `tour_contrib_guide.yml` en este directorio.
-
-```bash
-# Importar config YAML
-drush config:import --partial --source=config/install
-```
-
-### Limitaciones importantes para tu caso
-
-| Limitación | Impacto en tu proyecto |
-|---|---|
-| Solo usuarios autenticados | ❌ No sirve para anónimos |
-| Requiere toolbar de Drupal | ❌ Puede no estar en el front-end |
-| No espera Web Components | ⚠️ Los selectores pueden fallar |
-| Shepherd.js versión fija | ⚠️ Puede quedar desactualizado |
-| CSS difícil de personalizar | ⚠️ Conflictos con Tailwind |
+| Feature                    | Guided Tour (this module) | Tour contrib 2.x  |
+|----------------------------|:-------------------------:|:-----------------:|
+| Anonymous users            | ✅                        | ❌                |
+| Role targeting             | ✅ Full                   | ⚠️ Limited        |
+| Web Components support     | ✅                        | ❌                |
+| Tailwind CSS compatible    | ✅                        | ⚠️                |
+| Admin UI                   | ✅                        | ✅                |
+| Custom JS events           | ✅                        | ❌                |
+| Cookie-based dismissal     | ✅ PHP + JS               | ⚠️ JS only        |
+| Driver.js up to date       | ✅                        | ⚠️                |
+| Requires Drupal toolbar    | ❌ Not required           | ✅ Required       |
 
 ---
 
-## Tabla comparativa final
+## Troubleshooting
 
-| Criterio                  | Custom Shepherd.js | Tour contrib 2.x |
-|---------------------------|:-----------------:|:----------------:|
-| Usuarios anónimos         | ✅                 | ❌               |
-| Roles específicos         | ✅ Total           | ⚠️ Limitado      |
-| Web Components (waitForWC)| ✅                 | ❌               |
-| Compatible con Tailwind   | ✅ (prefijo CSS)   | ⚠️               |
-| UI gráfica                | ❌ (YAML)          | ✅               |
-| Sin desarrollo            | ❌                 | ✅               |
-| Shepherd.js actualizado   | ✅                 | ⚠️               |
-| Eventos custom JS         | ✅                 | ❌               |
-| Cookie de dismissal       | ✅ PHP+JS          | ⚠️ Solo JS       |
+**Driver.js files not found (`web/libraries/driver.js/` is empty)**
+Run `composer install` and verify that `oomphinc/composer-installers-extender` is installed
+and the `installer-paths` configuration includes `"type:npm-asset"`.
 
-**Recomendación para tu proyecto:** Módulo custom (Enfoque A).
-Tour contrib es viable únicamente si los tours son exclusivamente
-para administradores/editores autenticados con acceso al toolbar.
+**Tour does not appear**
+- Verify the tour is enabled in the admin UI.
+- Check the route name matches exactly (use `drush route` to list routes).
+- Check the role matches the current user.
+- Open DevTools → Application → Cookies and confirm no `guided_tour_dismissed_*` cookie exists.
+
+**Tour starts before Web Components render**
+Set `wait_for_wc: true` in the tour YAML and ensure your components use standard
+Custom Elements v1 (`customElements.define()`).
+
+---
+
+## Maintainers
+
+- [Your Drupal.org username](https://www.drupal.org/u/your-username)
