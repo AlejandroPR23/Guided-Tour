@@ -1,8 +1,10 @@
 name: Guided Tour
 type: module
-description: 'Tours guiados con Shepherd.js para usuarios anónimos y con roles. Compatible con web components Storybook/Tailwind.'
+description: 'Tours guiados con Driver.js para usuarios anónimos y con roles. Compatible con web components Storybook/Tailwind.'
 package: Custom
 version: 1.0.0
 core_version_requirement: ^10 || ^11
 dependencies:
   - drupal:user
+optional:
+  - config_translation

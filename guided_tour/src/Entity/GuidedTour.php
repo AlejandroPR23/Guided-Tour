@@ -29,6 +29,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
+ *    "config_translation" = {
+ *       "mapper" = "Drupal\config_translation\ConfigEntityMapper",
+ *     },
  *   },
  *   config_prefix = "tour",
  *   admin_permission = "administer guided tours",
@@ -54,6 +57,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "add-form"      = "/admin/config/user-interface/guided-tour/add",
  *     "edit-form"     = "/admin/config/user-interface/guided-tour/{guided_tour}/edit",
  *     "delete-form"   = "/admin/config/user-interface/guided-tour/{guided_tour}/delete",
+ *     "drupal:config-translation-overview" = "/admin/config/user-interface/guided-tour/{guided_tour}/translate",
+ *     "drupal:config-translation-add"      = "/admin/config/user-interface/guided-tour/{guided_tour}/translate/{langcode}/add",
+ *     "drupal:config-translation-edit"     = "/admin/config/user-interface/guided-tour/{guided_tour}/translate/{langcode}/edit",
+ *     "drupal:config-translation-delete"   = "/admin/config/user-interface/guided-tour/{guided_tour}/translate/{langcode}/delete",
  *   }
  * )
  */
@@ -89,9 +96,9 @@ class GuidedTour extends ConfigEntityBase implements GuidedTourInterface {
   protected bool $wait_for_wc = TRUE;
 
   /**
-   * Opciones globales de Shepherd (useModalOverlay, etc)
+   * Opciones globales de Driver.js (useModalOverlay, etc)
    *
-   * @var array Opciones globales de Shepherd (useModalOverlay, etc) */
+   * @var array Opciones globales de Driverjs (useModalOverlay, etc) */
   protected array $options = ['useModalOverlay' => TRUE];
 
   /**
@@ -101,7 +108,7 @@ class GuidedTour extends ConfigEntityBase implements GuidedTourInterface {
   protected array $steps = [];
 
   /**
-   * ── Getters ────────────────────────────────────────────────────────────────
+   * {@inheritdoc}
    */
   public function getRoutes(): array {
     return $this->routes;
@@ -136,7 +143,7 @@ class GuidedTour extends ConfigEntityBase implements GuidedTourInterface {
   }
 
   /**
-   * Retorna las opciones globales de Shepherd para este tour.
+   * Retorna las opciones globales de Driver.js para este tour.
    */
   public function getOptions(): array {
     return $this->options;

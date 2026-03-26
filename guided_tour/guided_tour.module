@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Módulo para tours guiados con Shepherd.js.
+ * Módulo para tours guiados con Driver.js.
  */
 
 declare(strict_types=1);
@@ -16,7 +16,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 function guided_tour_help(string $route_name, RouteMatchInterface $route_match): string { //phpcs:ignore
   return match($route_name) {
     'help.page.guided_tour' =>
-    '<p>' . t('Tours guiados con Shepherd.js.
+    '<p>' . t('Tours guiados con Driver.js.
     Gestiona los tours en <a href=":url">
     Configuración > Interfaz de usuario > Tours guiados</a>.', [
       ':url' => '/admin/config/user-interface/guided-tour',

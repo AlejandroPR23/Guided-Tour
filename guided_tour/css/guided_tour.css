@@ -1,242 +1,270 @@
 /**
- * guided_tour.css — Driver.js + Drupal 11
+ * guided_tour.css
  *
- * Driver.js genera clases .driver-popover, .driver-overlay, etc.
- * Las sobreescribimos con prefijo .guided-tour__ para no colisionar con Tailwind.
- * La clase base .guided-tour__popover se pasa en popoverClass al crear el driver.
+ * Overrides visuales para Driver.js con clases del módulo guided_tour.
  */
 
-/* ── Variables ───────────────────────────────────────────────────────────── */
 :root {
-  --gt-primary:       #1e3a5f;   /* blue-900 equivalente */
+  --gt-primary: #1e3a5f;
   --gt-primary-hover: #1e40af;
-  --gt-text:          #111827;   /* gray-900 */
-  --gt-text-muted:    #6b7280;   /* gray-500 */
-  --gt-bg:            #ffffff;
-  --gt-border:        #f3f4f6;   /* gray-100 */
-  --gt-radius:        16px;      /* rounded-2xl */
-  --gt-shadow:        0 20px 60px rgba(0, 0, 0, 0.18);
+  --gt-text: #111827;
+  --gt-text-muted: #6b7280;
+  --gt-bg: #ffffff;
+  --gt-border: #e5e7eb;
+  --gt-radius: 16px;
+  --gt-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  --gt-z: 99999;
 }
 
-/* ── Contenedor principal ────────────────────────────────────────────────── */
-.shepherd-element {
-  background:    var(--gt-bg) !important;
-  border:        1px solid #e5e7eb !important; /* border-gray-200 */
+.driver-active *:not(.driver-overlay):not(.driver-overlay *) {
+  pointer-events: auto !important;
+}
+
+.driver-popover.guided-tour__popover {
+  background: var(--gt-bg) !important;
+  border: 1px solid var(--gt-border) !important;
   border-radius: var(--gt-radius) !important;
-  box-shadow:    var(--gt-shadow) !important;
-  max-width:     400px !important;
-  width:         400px !important;
-  opacity:       0;
-  transition:    opacity 0.3s, visibility 0.3s !important;
+  box-shadow: var(--gt-shadow) !important;
+  color: var(--gt-text) !important;
+  max-width: 400px !important;
+  min-width: 320px !important;
+  padding: 0 !important;
+  z-index: var(--gt-z) !important;
 }
 
-.shepherd-enabled.shepherd-element {
-  opacity: 1 !important;
-  visibility: visible !important;
+.driver-popover.guided-tour__popover .driver-popover-title {
+  color: var(--gt-text) !important;
+  display: block !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  padding: 0 20px 8px !important;
 }
 
-.shepherd-content {
-  border-radius: var(--gt-radius) !important;
-  padding:       0 !important;
-  overflow:      hidden;
-}
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
-.shepherd-header {
-  display:         flex !important;
-  align-items:     center !important;
-  justify-content: space-between !important;
-  padding:         16px 20px !important;
-  background:      var(--gt-bg) !important;
-  border-bottom:   1px solid var(--gt-border) !important;
-  border-radius:   0 !important;
-}
-
-/* Dot animado + "Paso X de N" — se inyecta vía JS en el header */
-.shepherd-step-indicator {
-  display:     flex;
+.guided-tour__step-indicator {
   align-items: center;
-  gap:         8px;
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--gt-border) !important;
 }
 
-.shepherd-step-indicator__dot {
-  width:            8px;
-  height:           8px;
-  border-radius:    50%;
-  background:       var(--gt-primary);
-  animation:        gt-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.guided-tour__step-indicator-dot {
+  animation: gt-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: var(--gt-primary);
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+.guided-tour__step-indicator-text {
+  color: var(--gt-text-muted);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 @keyframes gt-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
-.shepherd-step-indicator__text {
-  font-size:   12px;
-  font-weight: 500;
-  color:       var(--gt-text-muted);
-}
-
-/* Título (oculto — usamos el indicador como header) */
-.shepherd-title {
-  display: none !important;
-}
-
-/* Botón X de cierre */
-.shepherd-cancel-icon {
-  background:  transparent !important;
-  border:      none !important;
-  color:       var(--gt-text-muted) !important;
-  font-size:   18px !important;
-  font-weight: 400 !important;
-  cursor:      pointer !important;
-  padding:     4px !important;
-  border-radius: 6px !important;
-  line-height: 1 !important;
-  transition:  background 0.15s ease, color 0.15s ease !important;
-}
-.shepherd-cancel-icon:hover {
-  background: #f3f4f6 !important;
-  color:      var(--gt-text) !important;
-}
-
-/* ── Cuerpo / texto ──────────────────────────────────────────────────────── */
-.shepherd-text {
-  padding:     20px !important;
-  color:       var(--gt-text-muted) !important;
-  font-size:   14px !important;
+.driver-popover.guided-tour__popover .driver-popover-description {
+  color: var(--gt-text-muted) !important;
+  font-size: 14px !important;
   line-height: 1.6 !important;
+  margin: 0 !important;
+  padding: 0 20px 16px !important;
 }
 
-/* Título del paso (h3 dentro del texto) */
-.shepherd-text h3,
-.shepherd-text strong {
-  display:     block;
-  font-size:   18px !important;
-  font-weight: 700 !important;
-  color:       var(--gt-text) !important;
-  margin:      0 0 8px !important;
-  line-height: 1.3;
-}
-
-.shepherd-text p {
+.guided-tour__text {
   margin: 0 !important;
 }
 
-/* ── Progress dots ───────────────────────────────────────────────────────── */
-.shepherd-progress-dots {
-  display:         flex;
+.guided-tour__text h3,
+.guided-tour__text strong {
+  color: var(--gt-text) !important;
+  display: block;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  margin: 0 0 8px !important;
+}
+
+.guided-tour__progress-dots {
+  align-items: center;
+  display: flex;
+  gap: 6px;
   justify-content: center;
-  align-items:     center;
-  gap:             6px;
-  padding:         0 20px 12px;
+  margin-top: 20px;
 }
 
-.shepherd-progress-dots__dot {
-  height:        6px;
+.guided-tour__progress-dot {
+  background: #e5e7eb;
   border-radius: 9999px;
-  background:    #e5e7eb; /* gray-200 */
-  width:         6px;
-  transition:    all 0.2s ease;
+  height: 6px;
+  transition: all 0.2s ease;
+  width: 6px;
 }
 
-.shepherd-progress-dots__dot--active {
-  width:      24px;
+.guided-tour__progress-dot--active {
   background: var(--gt-primary);
+  width: 24px;
 }
 
-.shepherd-progress-dots__dot--past {
+.guided-tour__progress-dot--past {
   background: rgba(30, 58, 95, 0.4);
 }
 
-/* ── Footer ──────────────────────────────────────────────────────────────── */
-.shepherd-footer {
-  display:          flex !important;
-  align-items:      center !important;
-  justify-content:  space-between !important;
-  padding:          16px 20px !important;
-  border-top:       1px solid var(--gt-border) !important;
-  background:       #f9fafb !important; /* gray-50 */
-  border-radius:    0 0 var(--gt-radius) var(--gt-radius) !important;
-  gap:              8px !important;
+.driver-popover.guided-tour__popover .driver-popover-footer {
+  align-items: center !important;
+  background: #f9fafb !important;
+  border-radius: 0 0 var(--gt-radius) var(--gt-radius) !important;
+  border-top: 1px solid var(--gt-border) !important;
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: space-between !important;
+  padding: 16px 20px !important;
 }
 
-/* Botón "Saltar tour" */
-.shepherd-button.shepherd-button-secondary {
-  background:  transparent !important;
-  border:      none !important;
-  color:       var(--gt-text-muted) !important;
-  font-size:   14px !important;
-  font-weight: 500 !important;
-  padding:     0 !important;
-  cursor:      pointer !important;
-  transition:  color 0.15s ease !important;
-  border-radius: 0 !important;
+.driver-popover.guided-tour__popover .driver-popover-progress-text {
+  display: none !important;
 }
-.shepherd-button.shepherd-button-secondary:not(:disabled):hover {
+
+.driver-popover.guided-tour__popover .driver-popover-navigation-btns {
+  display: flex !important;
+  gap: 8px !important;
+  margin-left: auto !important;
+}
+
+.guided-tour__footer-cancel {
   background: transparent !important;
-  color:      var(--gt-text) !important;
+  border: none !important;
+  color: var(--gt-text-muted) !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 0 !important;
+  transition: color 0.15s ease !important;
 }
 
-/* Botón "Siguiente" / "Anterior" */
-.shepherd-button {
-  display:       inline-flex !important;
-  align-items:   center !important;
-  gap:           4px !important;
-  background:    var(--gt-primary) !important;
-  color:         #ffffff !important;
-  border:        none !important;
-  border-radius: 12px !important;
-  font-size:     14px !important;
-  font-weight:   600 !important;
-  padding:       10px 20px !important;
-  cursor:        pointer !important;
-  transition:    background 0.15s ease !important;
-  margin-right:  0 !important;
+.guided-tour__footer-cancel:hover {
+  color: var(--gt-text) !important;
 }
-.shepherd-button:not(:disabled):hover {
+
+.driver-popover.guided-tour__popover .driver-popover-prev-btn,
+.driver-popover.guided-tour__popover .driver-popover-next-btn {
+  align-items: center !important;
+  border: none !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 10px 20px !important;
+  text-shadow: none !important;
+  transition: background 0.15s ease !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-prev-btn {
+  background: transparent !important;
+  border: 1.5px solid var(--gt-border) !important;
+  color: var(--gt-text) !important;
+  align-items: center !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 10px 20px !important;
+  text-shadow: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-prev-btn:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-next-btn {
+  background: var(--gt-primary) !important;
+  color: #ffffff !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-next-btn:hover {
   background: var(--gt-primary-hover) !important;
-  color:      #ffffff !important;
 }
 
-/* Botón anterior (outline style) */
-.shepherd-button.shepherd-button-prev {
-  background:  #f1f5f9 !important;
-  color:       var(--gt-text) !important;
-  border-radius: 12px !important;
-}
-.shepherd-button.shepherd-button-prev:not(:disabled):hover {
-  background: #e2e8f0 !important;
-  color:      var(--gt-text) !important;
-}
-
-/* ── Flecha del popover ──────────────────────────────────────────────────── */
-.shepherd-arrow:before {
-  background: var(--gt-bg) !important;
-  box-shadow: -1px -1px 0 #e5e7eb !important;
+.driver-popover.guided-tour__popover .driver-popover-close-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--gt-text-muted) !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  padding: 4px 8px !important;
+  right: 8px !important;
+  top: 8px !important;
+  opacity: 1 !important;
 }
 
-/* ── Overlay ─────────────────────────────────────────────────────────────── */
-.shepherd-modal-overlay-container {
-  z-index: 9997 !important;
-}
-.shepherd-modal-overlay-container.shepherd-modal-is-visible {
-  opacity: 0.6 !important;
+.driver-popover.guided-tour__popover .driver-popover-close-btn:hover {
+  color: var(--gt-text) !important;
+  opacity: 1 !important;
 }
 
-/* ── Elemento resaltado ──────────────────────────────────────────────────── */
-.shepherd-target {
-  outline:        2px solid var(--gt-primary) !important;
+.driver-popover.guided-tour__popover .driver-popover-arrow {
+  border-width: 25px !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-top::after {
+  border-top-color: var(--gt-bg) !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-bottom::after {
+  border-bottom-color: var(--gt-bg) !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-left::after {
+  border-left-color: var(--gt-bg) !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-right::after {
+  border-right-color: var(--gt-bg) !important;
+}
+
+/* Sombra sutil para que la flecha destaque sobre fondos oscuros */
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-top {
+  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.12)) !important;
+}
+
+.driver-popover.guided-tour__popover .driver-popover-arrow-side-bottom {
+  filter: drop-shadow(0 -3px 3px rgba(0,0,0,0.12)) !important;
+}
+
+
+
+.driver-active-element {
+  border-radius: 4px !important;
+  outline: 2px solid var(--gt-primary) !important;
   outline-offset: 4px !important;
-  border-radius:  4px !important;
 }
 
-/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .shepherd-element {
+  .driver-popover.guided-tour__popover {
     max-width: calc(100vw - 24px) !important;
-    width:     auto !important;
+    min-width: auto !important;
   }
 }
 
@@ -257,6 +285,7 @@
   cursor: pointer !important;
   transition: background 0.15s ease !important;
 }
+
 .guided-tour-trigger--button .guided-tour-trigger__btn:hover {
   background: var(--gt-primary-hover) !important;
 }
@@ -279,6 +308,7 @@
   right: 24px !important;
   z-index: 9990 !important;
 }
+
 .guided-tour-trigger--fab .guided-tour-trigger__btn {
   width: 52px !important;
   height: 52px !important;
@@ -288,18 +318,21 @@
   border: none !important;
   font-size: 22px !important;
   cursor: pointer !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   transition: background 0.15s ease, transform 0.15s ease !important;
 }
+
 .guided-tour-trigger--fab .guided-tour-trigger__btn:hover {
   background: var(--gt-primary-hover) !important;
   transform: scale(1.08) !important;
 }
+
 .guided-tour-trigger--fab .guided-tour-trigger__label {
-  display: none !important; /* FAB solo muestra el icono */
+  display: none !important;
+  /* FAB solo muestra el icono */
 }
 
 .guided-tour-trigger__icon {

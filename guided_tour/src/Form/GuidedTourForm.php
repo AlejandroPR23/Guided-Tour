@@ -12,14 +12,20 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
- * Formulario de creación/edición de un tour guiado.
+ * Provides the creation and editing form for a guided tour.
  *
- * Los campos básicos (rutas, roles, opciones) se editan con controles de form.
- * Los pasos del tour se editan como YAML — es el formato más legible para
- * estructuras anidadas complejas y no requiere un widget de arrastre complejo.
+ * Basic fields (routes, roles, options) are edited with standard form controls.
+ * Tour steps are edited as YAML — it is the most readable format for
+ * complex nested structures.
  */
 class GuidedTourForm extends EntityForm {
 
+  /**
+   * Constructs a new GuidedTourForm.
+   *
+   * @param \Drupal\user\RoleStorageInterface $roleStorage
+   *   The role storage.
+   */
   public function __construct(
     protected RoleStorageInterface $roleStorage,
   ) {}
@@ -77,10 +83,11 @@ class GuidedTourForm extends EntityForm {
     $form['routing']['routes_text'] = [
       '#type'          => 'textarea',
       '#title'         => $this->t('Rutas de Drupal'),
+      
       '#description'   => $this->t(
         'Una ruta por línea. Usa el nombre interno de ruta de Drupal, ej: <code>entity.node.canonical</code>, <code>&lt;front&gt;</code>. Deja vacío para todas las rutas.'
       ),
-      '#default_value' => $this->routeParamsToText($tour->getRoutes()),
+      '#default_value' => implode("\n", $tour->getRoutes()),
       '#rows'          => 4,
     ];
 
@@ -204,7 +211,10 @@ class GuidedTourForm extends EntityForm {
         Yaml::parse($params_text);
       }
       catch (ParseException $e) {
-        $form_state->setErrorByName('route_params', $this->t('Parámetros inválidos: @error', ['@error' => $e->getMessage()]));
+        $form_state->setErrorByName(
+          'route_params',
+          $this->t('Parámetros inválidos: @error',
+          ['@error' => $e->getMessage()]));
       }
     }
   }
@@ -212,7 +222,7 @@ class GuidedTourForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state): int {
+  public function save(array $form, FormStateInterface $form_state): int { //phpcs:ignore
     /** @var \Drupal\guided_tour\Entity\GuidedTour $tour */
     $tour = $this->entity;
 
@@ -228,7 +238,7 @@ class GuidedTourForm extends EntityForm {
     $roles = array_filter($form_state->getValue('roles', []));
     $tour->set('roles', array_values($roles));
 
-    // Opciones de Shepherd.
+    // Opciones de Driver.js.
     $tour->set('options', [
       'useModalOverlay' => (bool) $form_state->getValue('use_modal_overlay'),
     ]);
@@ -254,7 +264,13 @@ class GuidedTourForm extends EntityForm {
   }
 
   /**
-   * ── Helpers ───────────────────────────────────────────────────────────────
+   * Converts route parameters to a YAML string.
+   *
+   * @param array $params
+   *   The route parameters array.
+   *
+   * @return string
+   *   The YAML representation of the parameters.
    */
   private function routeParamsToText(array $params): string {
     if (empty($params)) {
@@ -264,7 +280,13 @@ class GuidedTourForm extends EntityForm {
   }
 
   /**
-   * Convierte los pasos a YAML.
+   * Converts the tour steps array to a YAML string.
+   *
+   * @param array $steps
+   *   The array of steps.
+   *
+   * @return string
+   *   The YAML formatted steps.
    */
   private function stepsToYaml(array $steps): string {
     if (empty($steps)) {
@@ -274,7 +296,10 @@ class GuidedTourForm extends EntityForm {
   }
 
   /**
-   * Ejemplo de pasos en YAML para mostrar como referencia en el formulario.
+   * Provides a YAML example of steps for the UI reference.
+   *
+   * @return string
+   *   The YAML example string.
    */
   private function getYamlExample(): string {
     return <<<YAML
