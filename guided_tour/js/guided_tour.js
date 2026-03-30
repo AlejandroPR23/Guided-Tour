@@ -1,10 +1,12 @@
 /**
  * @file
  * Inicializa Driver.js. Soporta:
- *   - Arranque automático (autoPlay) o solo bajo demanda (botón replay)
- *   - Botón #guided-tour-replay-btn para relanzar el tour en cualquier momento
- *   - Web Components (waitForWC via customElements.whenDefined)
- *   - Cookie de dismissal con opción de borrarla desde el botón
+ * - Arranque automático (autoPlay) o solo bajo demanda (botón replay)
+ * - Botón #guided-tour-replay-btn para relanzar el tour en cualquier momento
+ * - Web Components (waitForWC via customElements.whenDefined)
+ * - Shadow DOM piercing con sintaxis "hostSelector >> shadowSelector"
+ * - Cookie de dismissal con opción de borrarla desde el botón
+ * - 👻 Creación dinámica de elementos fantasmas para soporte Shadow DOM
  */
 
 (function (Drupal, drupalSettings, once) {
@@ -14,45 +16,119 @@
   let activeTour = null;
   let activeTourFinishReason = null;
 
-  function getDriverFactory() {
-    if (window.driver && window.driver.js && typeof window.driver.js.driver === 'function') {
-      return window.driver.js.driver;
+  // 👻 ── Ghost Manager (NUEVO) ─────────────────────────────────────────────
+  let activeGhosts = [];
+  let ghostListenersBound = false;
+
+  /**
+   * Recalcula las coordenadas de todos los fantasmas activos.
+   */
+  function updateGhosts() {
+    if (!activeGhosts.length) return;
+    
+    activeGhosts.forEach(({ shadowEl, ghostEl }) => {
+      const rect = shadowEl.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return;
+
+      ghostEl.style.top = (rect.top + window.scrollY) + 'px';
+      ghostEl.style.left = (rect.left + window.scrollX) + 'px';
+      ghostEl.style.width = rect.width + 'px';
+      ghostEl.style.height = rect.height + 'px';
+    });
+  }
+
+  /**
+   * Crea un fantasma transparente en el Light DOM que replica al del Shadow DOM.
+   */
+  function createGhostFor(shadowEl) {
+    const ghostEl = document.createElement('div');
+    ghostEl.className = 'guided-tour-ghost';
+    ghostEl.style.position = 'absolute';
+    ghostEl.style.pointerEvents = 'none'; // Muy importante para no bloquear clics
+    ghostEl.style.zIndex = '-1'; // Para que no interfiera visualmente si no hay overlay
+    
+    document.body.appendChild(ghostEl);
+    activeGhosts.push({ shadowEl, ghostEl });
+
+    if (!ghostListenersBound) {
+      window.addEventListener('resize', updateGhosts);
+      window.addEventListener('scroll', updateGhosts, { passive: true });
+      ghostListenersBound = true;
     }
 
-    if (window.driver && typeof window.driver.driver === 'function') {
-      return window.driver.driver;
+    // Calcular posición inicial
+    updateGhosts();
+    return ghostEl;
+  }
+
+  /**
+   * Elimina los fantasmas y los listeners de la ventana.
+   */
+  function cleanupGhosts() {
+    activeGhosts.forEach(({ ghostEl }) => ghostEl.remove());
+    activeGhosts = [];
+    
+    if (ghostListenersBound) {
+      window.removeEventListener('resize', updateGhosts);
+      window.removeEventListener('scroll', updateGhosts);
+      ghostListenersBound = false;
+    }
+  }
+
+  // ── Shadow DOM helpers ──────────────────────────────────────────────────
+
+  function isShadowSelector(selector) {
+    return typeof selector === 'string' && selector.includes(' >> ');
+  }
+
+  function queryShadow(selector) {
+    if (!selector) return null;
+
+    if (!isShadowSelector(selector)) {
+      return document.querySelector(selector);
     }
 
-    if (typeof window.driver === 'function') {
-      return window.driver;
+    const parts = selector.split(' >> ').map(s => s.trim());
+    let context = document;
+
+    for (let i = 0; i < parts.length; i++) {
+      if (!context) return null;
+
+      const el = context.querySelector(parts[i]);
+      if (!el) return null;
+
+      if (i === parts.length - 1) return el;
+
+      if (!el.shadowRoot) {
+        console.warn(`[GuidedTour] El elemento "${parts[i]}" no tiene shadowRoot. No se puede perforar.`);
+        return null;
+      }
+      context = el.shadowRoot;
     }
 
     return null;
   }
 
-  function setCookie(name, value, days) {
-    const exp = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${exp}; path=/; SameSite=Lax`;
-  }
-
-  function deleteCookie(name) {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
-  }
-
-  function cleanupDriver() {
-    document.querySelectorAll('.driver-popover').forEach((el) => el.remove());
-    document.querySelectorAll('.driver-overlay').forEach((el) => el.remove());
-    document.querySelectorAll('.driver-active-element').forEach((el) => {
-      el.classList.remove('driver-active-element');
-    });
-    document.body.classList.remove('driver-active', 'driver-fade', 'driver-simple');
-  }
-
   function waitForElement(selector, timeout = 5000) {
     return new Promise((resolve) => {
-      const el = document.querySelector(selector);
+      const el = queryShadow(selector);
       if (el) {
         resolve(el);
+        return;
+      }
+
+      if (isShadowSelector(selector)) {
+        const interval = setInterval(() => {
+          const found = queryShadow(selector);
+          if (found) {
+            clearInterval(interval);
+            resolve(found);
+          }
+        }, 100);
+        setTimeout(() => {
+          clearInterval(interval);
+          resolve(queryShadow(selector));
+        }, timeout);
         return;
       }
 
@@ -63,7 +139,6 @@
           resolve(found);
         }
       });
-
       observer.observe(document.body, { childList: true, subtree: true });
       setTimeout(() => {
         observer.disconnect();
@@ -72,22 +147,69 @@
     });
   }
 
+  // ── Driver.js factory ───────────────────────────────────────────────────
+
+  function getDriverFactory() {
+    if (window.driver && window.driver.js && typeof window.driver.js.driver === 'function') {
+      return window.driver.js.driver;
+    }
+    if (window.driver && typeof window.driver.driver === 'function') {
+      return window.driver.driver;
+    }
+    if (typeof window.driver === 'function') {
+      return window.driver;
+    }
+    return null;
+  }
+
+  // ── Cookie helpers ──────────────────────────────────────────────────────
+
+  function setCookie(name, value, days) {
+    const exp = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${exp}; path=/; SameSite=Lax`;
+  }
+
+  function deleteCookie(name) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
+  }
+
+  // ── Driver.js cleanup ───────────────────────────────────────────────────
+
+  function cleanupDriver() {
+    document.querySelectorAll('.driver-popover').forEach((el) => el.remove());
+    document.querySelectorAll('.driver-overlay').forEach((el) => el.remove());
+    document.querySelectorAll('.driver-active-element').forEach((el) => {
+      el.classList.remove('driver-active-element');
+    });
+    document.body.classList.remove('driver-active', 'driver-fade', 'driver-simple');
+    
+    // 👻 Limpiamos los fantasmas al destruir el driver
+    cleanupGhosts(); 
+  }
+
+  // ── Web Components ──────────────────────────────────────────────────────
+
   async function waitForWebComponents(steps) {
     const wcRegex = /^[a-z][\w-]*-[\w-]+/;
     const promises = steps
       .map((step) => step.attachTo && step.attachTo.element)
       .filter(Boolean)
       .map((selector) => {
-        if (wcRegex.test(selector)) {
-          return customElements.whenDefined(selector);
-        }
+        const hostSelector = isShadowSelector(selector)
+          ? selector.split(' >> ')[0].trim()
+          : selector;
 
-        const match = selector.match(wcRegex);
+        if (wcRegex.test(hostSelector)) {
+          return customElements.whenDefined(hostSelector.replace(/[.#\[\]].*/,''));
+        }
+        const match = hostSelector.match(wcRegex);
         return match ? customElements.whenDefined(match[0]) : Promise.resolve();
       });
 
     await Promise.allSettled(promises);
   }
+
+  // ── Popover helpers ─────────────────────────────────────────────────────
 
   function normalizeSide(side) {
     const allowed = ['top', 'right', 'bottom', 'left'];
@@ -98,13 +220,13 @@
     return `
       <div class="guided-tour__progress-dots">
         ${Array.from({ length: total }, (_, i) => {
-      const cls = i === currentIndex
-        ? 'guided-tour__progress-dot guided-tour__progress-dot--active'
-        : i < currentIndex
-          ? 'guided-tour__progress-dot guided-tour__progress-dot--past'
-          : 'guided-tour__progress-dot';
-      return `<div class="${cls}"></div>`;
-    }).join('')}
+          const cls = i === currentIndex
+            ? 'guided-tour__progress-dot guided-tour__progress-dot--active'
+            : i < currentIndex
+              ? 'guided-tour__progress-dot guided-tour__progress-dot--past'
+              : 'guided-tour__progress-dot';
+          return `<div class="${cls}"></div>`;
+        }).join('')}
       </div>
     `;
   }
@@ -134,9 +256,9 @@
         <div class="guided-tour__step-indicator-dot"></div>
         <span class="guided-tour__step-indicator-text">
           ${Drupal.t('Step @current of @total', {
-        '@current': meta.index + 1,
-        '@total': meta.total,
-      })}
+            '@current': meta.index + 1,
+            '@total': meta.total,
+          })}
         </span>
       `;
       title.insertAdjacentElement('beforebegin', indicator);
@@ -185,7 +307,6 @@
         if (meta.isLast) {
           activeTourFinishReason = 'complete';
         }
-
         if (activeTour) {
           activeTour.moveNext();
         }
@@ -221,6 +342,8 @@
     }
   }
 
+  // ── Build steps ─────────────────────────────────────────────────────────
+
   function buildSteps(config) {
     const total = config.steps.length;
 
@@ -228,13 +351,8 @@
       const buttons = stepDef.buttons || [];
       const showButtons = ['close'];
 
-      if (getStepButton(buttons, 'back')) {
-        showButtons.push('previous');
-      }
-
-      if (getStepButton(buttons, 'next')) {
-        showButtons.push('next');
-      }
+      if (getStepButton(buttons, 'back')) showButtons.push('previous');
+      if (getStepButton(buttons, 'next')) showButtons.push('next');
 
       const step = {
         popover: {
@@ -260,12 +378,30 @@
       };
 
       if (stepDef.attachTo && stepDef.attachTo.element) {
-        step.element = stepDef.attachTo.element;
+        const selector = stepDef.attachTo.element;
+
+        if (isShadowSelector(selector)) {
+          const resolvedEl = queryShadow(selector);
+          if (resolvedEl) {
+            // 👻 En lugar de pasar el nodo real atrapado en el Shadow DOM, 
+            // le pasamos el fantasma anclado al Light DOM
+            step.element = createGhostFor(resolvedEl);
+          }
+          else {
+            console.warn(`[GuidedTour] Shadow selector no resuelto: "${selector}"`);
+            step.element = selector.split(' >> ')[0].trim();
+          }
+        }
+        else {
+          step.element = selector;
+        }
       }
 
       return step;
     });
   }
+
+  // ── Events ──────────────────────────────────────────────────────────────
 
   function dispatchTourEvent(config, eventName) {
     document.dispatchEvent(new CustomEvent(`guidedTour:${eventName}`, {
@@ -276,17 +412,19 @@
     }));
   }
 
+  // ── Create tour ─────────────────────────────────────────────────────────
+
   function createTour(config) {
     const factory = getDriverFactory();
-    if (!factory) {
-      return null;
-    }
+    if (!factory) return null;
 
-    const smoothScroll = !config.options || !config.options.defaultStepOptions || config.options.defaultStepOptions.scrollTo !== false;
+    const smoothScroll = !config.options ||
+      !config.options.defaultStepOptions ||
+      config.options.defaultStepOptions.scrollTo !== false;
+
     activeTourFinishReason = null;
-    let driverObj = null;
 
-    driverObj = factory({
+    const driverObj = factory({
       animate: true,
       allowClose: false,
       overlayOpacity: config.options && config.options.useModalOverlay === false ? 0 : 0.6,
@@ -297,10 +435,14 @@
       popoverOffset: 12,
       steps: buildSteps(config),
       onHighlighted(element, step) {
-        if (step && step.element && !document.querySelector(step.element)) {
+        if (step && step.element && typeof step.element === 'string' && !document.querySelector(step.element)) {
           console.warn(`[GuidedTour] Elemento no encontrado: "${step.element}"`);
         }
-
+        
+        // 👻 Forzamos una actualización de fantasmas por si la pantalla se movió
+        // justo antes de este paso durante el smoothScroll.
+        updateGhosts(); 
+        
         updatePopover(step);
       },
       onDestroyed() {
@@ -325,13 +467,13 @@
     return driverObj;
   }
 
+  // ── Replay button ───────────────────────────────────────────────────────
+
   function showReplayButton(config, onReplay) {
     const wrapper = document.querySelector('.guided-tour-trigger');
     const btn = document.getElementById('guided-tour-replay-btn');
 
-    if (!wrapper || !btn) {
-      return;
-    }
+    if (!wrapper || !btn) return;
 
     wrapper.style.display = '';
     wrapper.removeAttribute('aria-hidden');
@@ -342,20 +484,20 @@
     });
   }
 
+  // ── Drupal behavior ─────────────────────────────────────────────────────
+
   Drupal.behaviors.guidedTour = {
     attach(context, settings) {
       once('guided-tour-init', 'html', context).forEach(async () => {
         const config = settings.guidedTour;
         const driverFactory = getDriverFactory();
 
-        if (!config || !driverFactory) {
-          return;
-        }
+        if (!config || !driverFactory) return;
 
         const startTour = async () => {
           if (activeTour) {
             activeTourFinishReason = 'restart';
-            activeTour.destroy();
+            activeTour.destroy(); // Esto llamará automáticamente a cleanupGhosts()
             activeTour = null;
           }
 
@@ -365,15 +507,16 @@
             await waitForWebComponents(config.steps);
           }
 
-          const firstSelector = config.steps[0] && config.steps[0].attachTo && config.steps[0].attachTo.element;
+          const firstSelector = config.steps[0] &&
+            config.steps[0].attachTo &&
+            config.steps[0].attachTo.element;
+
           if (firstSelector) {
             await waitForElement(firstSelector);
           }
 
           activeTour = createTour(config);
-          if (!activeTour) {
-            return;
-          }
+          if (!activeTour) return;
 
           setTimeout(() => {
             activeTour.drive();

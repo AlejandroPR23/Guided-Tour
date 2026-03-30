@@ -53,7 +53,8 @@ class TourTriggerBlock extends BlockBase {
       '#options'       => [
         'button' => $this->t('Botón primario'),
         'link'   => $this->t('Enlace'),
-        'fab'    => $this->t('Botón flotante (FAB)'),
+        'fab-derecha'    => $this->t('Botón flotante (FAB)'),
+        'fab-izquierda'  => $this->t('Botón flotante (FAB) - izquierda'),
       ],
       '#default_value' => $config['button_style'],
     ];
@@ -89,11 +90,16 @@ class TourTriggerBlock extends BlockBase {
     $label  = $config['button_label'];
     $icon   = $config['icon'] ? '<span class="guided-tour-trigger__icon" aria-hidden="true">?</span>' : '';
 
+    $classes = ['guided-tour-trigger', 'guided-tour-trigger--' . $style];
+    if (str_starts_with($style, 'fab')) {
+      $classes[] = 'guided-tour-trigger--fab';
+    }
+    
     return [
       '#type'       => 'html_tag',
       '#tag'        => 'div',
       '#attributes' => [
-        'class'           => ['guided-tour-trigger', 'guided-tour-trigger--' . $style],
+        'class'           => $classes,
         'id'              => 'guided-tour-trigger',
         'style'           => 'display: none;',
         'aria-hidden'     => 'true',

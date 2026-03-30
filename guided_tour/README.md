@@ -1,304 +1,172 @@
 # Guided Tour
 
-Provides guided tours using [Driver.js](https://driverjs.com) for Drupal 10 and 11.
-Tours work for **anonymous and authenticated users**, support **role-based targeting**,
-and are fully compatible with **Web Components** (Storybook / Lit / Tailwind).
+Provides an interactive guided tour experience for Drupal sites using
+[Driver.js](https://driverjs.com/). Allows administrators to create
+step-by-step tours to onboard users and highlight key features of the
+interface.
 
----
+## Table of contents
 
-## Features
-
-- Role-based tours (anonymous, editor, administrator, or any custom role)
-- Compatible with Web Components — waits for custom elements to upgrade before starting
-- Cookie-based dismissal (configurable days per tour)
-- Replay button block (primary button, link, or FAB styles)
-- YAML-based tour configuration (importable via `drush config:import`)
-- Admin UI to create and manage tours without code
-- Custom JS events (`guidedTour:complete`, `guidedTour:cancel`) for analytics integration
-- Compatible with Tailwind CSS (scoped CSS variables, no conflicts)
-
----
+- [Requirements](#requirements)
+- [Recommended modules](#recommended-modules)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [Maintainers](#maintainers)
 
 ## Requirements
 
-- Drupal 10.x or 11.x
-- PHP 8.1+
-- Composer
-- The [asset-packagist](https://asset-packagist.org) repository configured in your project
+- Drupal core: ^9 || ^10 || ^11
+- [Driver.js](https://driverjs.com/) library (v1.4.x) — MIT License
 
----
+## Recommended modules
+
+- [Libraries API](https://www.drupal.org/project/libraries): Useful for
+  managing the Driver.js local installation.
+- [Advanced Help](https://www.drupal.org/project/advanced_help): Displays
+  module help in the admin section.
 
 ## Installation
 
-### Step 1 — Configure asset-packagist in your project root
-
-Open your **project root** `composer.json` (not this module's) and add two blocks.
-
-#### 1a. Add the asset-packagist repository
-
-```json
-"repositories": [
-    {
-        "type": "composer",
-        "url": "https://asset-packagist.org"
-    }
-]
-```
-
-#### 1b. Add the installer path for npm assets
-
-Inside `"extra"` → `"installer-paths"`, add this entry so Driver.js lands in `web/libraries/`:
-
-```json
-"extra": {
-    "installer-types": ["npm-asset", "bower-asset"],
-    "installer-paths": {
-        "web/libraries/{$name}": [
-            "type:npm-asset",
-            "type:bower-asset"
-        ]
-    }
-}
-```
-
-> If you already have `"installer-paths"` configured, just add the `"web/libraries/{$name}"` entry — do not duplicate the whole block.
-
-#### 1c. Require the oomphinc/composer-installers-extender plugin
-
-This plugin is needed for Composer to know how to handle `npm-asset` packages:
-
-```bash
-composer require oomphinc/composer-installers-extender
-```
-
----
-
-### Step 2 — Require the module
+### Via Composer (recommended)
 
 ```bash
 composer require drupal/guided_tour
 ```
 
-Composer will automatically download Driver.js into `web/libraries/driver.js/`.
+Driver.js will be installed automatically into `/libraries/driver.js/`.
 
----
+### Manual download (alternative)
 
-### Step 3 — Enable the module
+1. Download Driver.js v1.4.x from
+   [github.com/kamranahmedse/driver.js](https://github.com/kamranahmedse/driver.js/releases).
+2. Place the files in `/libraries/driver.js/`.
+3. Verify the following files exist:
+   - `/libraries/driver.js/dist/driver.js.iife.js`
+   - `/libraries/driver.js/dist/driver.css`
 
-```bash
-drush pm:enable guided_tour
-drush cr
-```
-
----
-
-## Verifying the installation
-
-After running Composer, confirm Driver.js was downloaded:
+### Enable the module
 
 ```bash
-ls web/libraries/driver.js/dist/
-# Expected: driver.js.iife.js  driver.css  (plus other files)
+drush en guided_tour && drush cr
 ```
 
-If the folder is missing, run:
+Or navigate to **Administration > Extend** and enable **Guided Tour**.
 
-```bash
-composer install
-```
+## Configuration
 
----
+Go to **Administration > Configuration > User Interface > Guided Tour**
+and click **Add tour**. Fill in the following fields:
 
-## Creating tours
+### General settings
 
-### Option A — Admin UI
+- **Tour name** *(required)*: Internal identifier for the tour.
+- **Enabled**: Toggle to activate or deactivate the tour without
+  deleting it.
 
-1. Go to **Administration > Configuration > User Interface > Guided Tours**
-   (`/admin/config/user-interface/guided-tour`)
-2. Click **Add guided tour**
-3. Fill in the label, routes, roles, and steps
-4. Save
+### Routes and conditions
 
-### Option B — YAML configuration files
+- **Drupal routes**: One route per line. Use the internal Drupal route
+  name (e.g. `entity.node.canonical`, `<front>`). Leave empty to match
+  all routes.
+- **Route parameters**: One parameter per line in `key: value` format
+  (e.g. `node: 2707`). Use this to target a specific node, view, or
+  form. Leave empty to ignore parameters.
+- **Roles that see the tour**: Select which roles will see this tour.
+  Leave all unchecked to display the tour to all roles.
 
-Create a file in `config/install/` of your custom module:
+### Behavior
+
+- **Dismissal days**: Number of days before the tour reappears for a
+  user. The tour is marked as seen when the user either completes all
+  steps or clicks the dismiss/skip button. After the specified number
+  of days, the tour will appear again. Use `0` to always show the tour
+  on every visit (no cookie is stored). Example: `365` means the tour
+  will not reappear for one year after the user completes or skips it.
+- **Wait for Web Components**: Enable this option if your tour targets
+  elements that are Web Components (Lit/Storybook). The tour will wait
+  for them to upgrade before starting.
+- **Dark overlay**: Displays a semi-transparent dark overlay behind the
+  active highlighted element.
+
+### Tour steps (YAML format)
+
+Define the tour steps in YAML. Each step supports the following fields:
 
 ```yaml
-# my_module/config/install/guided_tour.tour.my_tour.yml
-id: my_tour
-label: 'My tour'
-status: true
-routes:
-  - '<front>'
-roles:
-  - anonymous
-cookie_days: 365
-wait_for_wc: true
-options:
-  useModalOverlay: true
-steps:
-  -
-    id: step-welcome
-    attachTo:
-      element: '[data-tour="main-header"]'
-      on: bottom
-    title: 'Welcome!'
-    text: 'This is the homepage.'
-    buttons:
-      - { text: 'Next', type: next }
-      - { text: 'Skip', type: cancel, secondary: true }
-  -
-    id: step-nav
-    attachTo:
-      element: '[data-tour="main-nav"]'
-      on: bottom
-    title: 'Navigation'
-    text: 'Use this menu to browse the site.'
-    buttons:
-      - { text: 'Back', type: back }
-      - { text: 'Got it!', type: next }
+- id: step-1
+  title: 'Title of the first step'
+  text: 'Brief description of what the user sees here.'
+  attachTo:
+    element: '[data-tour="my-component"]'
+    on: bottom
+  buttons:
+    - text: 'Next'
+      type: next
+    - text: 'Skip tour'
+      type: cancel
+
+- id: step-2
+  title: 'Second step'
+  text: 'More information about this section.'
+  attachTo:
+    element: '[data-tour="other-component"]'
+    on: right
+  buttons:
+    - text: 'Back'
+      type: back
+    - text: 'Next'
+      type: next
 ```
 
-Import it:
+**Supported fields per step:**
 
-```bash
-drush config:import --partial --source=modules/custom/my_module/config/install
-drush cr
-```
+| Field              | Required | Description                                          |
+|--------------------|----------|------------------------------------------------------|
+| `id`               | ✓        | Unique identifier for the step                       |
+| `title`            | ✓        | Step heading displayed to the user                   |
+| `text`             | ✓        | Step body description                                |
+| `attachTo.element` | ✗        | CSS selector of the highlighted element              |
+| `attachTo.on`      | ✗        | Popover position: `top`, `bottom`, `left`, `right`   |
+| `buttons`          | ✗        | Action buttons. Types: `next`, `back`, `cancel`      |
 
----
+> **Tip:** To target Web Components or Lit elements, add a
+> `data-tour="my-element"` attribute to the element and reference it
+> in `attachTo.element` as `[data-tour="my-element"]`.
 
-## Adding `data-tour` attributes to your components
+### Adding the tour trigger button
 
-Shepherd uses CSS selectors to attach tour steps to elements.
-Add `data-tour` attributes to any element you want to highlight:
+The module provides a block with a configurable button to manually
+trigger the guided tour. To add it:
 
-```html
-<header data-tour="main-header">...</header>
-<nav data-tour="main-nav">...</nav>
-<input data-tour="search-bar" />
-```
+1. Go to **Administration > Structure > Block layout**.
+2. Choose the region where the button should appear and click
+   **Place block**.
+3. Search for **Guided Tour Button** and click **Place block**.
+4. Fill in the block settings:
+   - **Title**: Block title displayed to the user.
+   - **Button text**: Label shown on the button
+     (e.g. `Do you need help? View tour`).
+   - **Visual style**: Choose the button appearance:
+     - `Floating button (FAB)`: Fixed floating action button always
+       visible on screen.
+5. Click **Save block**.
 
-For **Web Components** (LitElement, etc.):
-
-```javascript
-render() {
-  return html`
-    <header data-tour="main-header" class="...">
-      ...
-    </header>
-  `;
-}
-```
-
----
-
-## Replay button block
-
-Place the **Guided Tour Button** block in any theme region:
-
-1. Go to **Structure > Block layout**
-2. Click **Place block** in the desired region
-3. Search for "Guided Tour Button"
-4. Configure label, style (`button`, `link`, or `fab`), and icon
-5. Save
-
-The block is hidden automatically on pages without an active tour.
-
----
-
-## JavaScript events
-
-Listen to tour lifecycle events from any JS file or Web Component:
-
-```javascript
-document.addEventListener('guidedTour:complete', (e) => {
-  console.log('Tour completed:', e.detail.tourId, 'role:', e.detail.role);
-  // Example: send to GA4
-  gtag('event', 'tour_complete', { tour_id: e.detail.tourId });
-});
-
-document.addEventListener('guidedTour:cancel', (e) => {
-  console.log('Tour cancelled:', e.detail);
-});
-```
-
----
-
-## Clearing the dismissal cookie (development)
-
-To re-trigger a tour that has already been dismissed:
-
-```javascript
-// Paste in browser console:
-document.cookie.split(';').forEach(c => {
-  if (c.includes('guided_tour_')) {
-    document.cookie = c.split('=')[0] + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  }
-});
-location.reload();
-```
-
----
-
-## Configuration reference
-
-| Key            | Type    | Default | Description                                              |
-|----------------|---------|---------|----------------------------------------------------------|
-| `routes`       | list    | `[]`    | Drupal route names where the tour appears. Empty = all.  |
-| `route_params` | map     | `{}`    | Filter by specific route parameters (e.g. `node: 42`).  |
-| `roles`        | list    | `[]`    | Roles that see the tour. Empty = all roles.              |
-| `cookie_days`  | integer | `365`   | Days to remember dismissal. `0` = never remember.       |
-| `wait_for_wc`  | boolean | `true`  | Wait for Web Components to upgrade before starting.      |
-| `options`      | map     | —       | Driver.js global options (e.g. `useModalOverlay: true`). |
-| `steps`        | list    | `[]`    | Tour steps (see YAML example above).                     |
-
-### Step keys
-
-| Key        | Required | Description                                                     |
-|------------|----------|-----------------------------------------------------------------|
-| `id`       | Yes      | Unique step identifier.                                         |
-| `title`    | Yes      | Step popover title (translatable).                              |
-| `text`     | Yes      | Step popover body text (translatable).                          |
-| `attachTo` | No       | `element` (CSS selector) and `on` (top/right/bottom/left).     |
-| `buttons`  | No       | List of buttons with `text` and `type` (next/back/cancel).     |
-
----
-
-## Comparison with Tour contrib
-
-| Feature                    | Guided Tour (this module) | Tour contrib 2.x  |
-|----------------------------|:-------------------------:|:-----------------:|
-| Anonymous users            | ✅                        | ❌                |
-| Role targeting             | ✅ Full                   | ⚠️ Limited        |
-| Web Components support     | ✅                        | ❌                |
-| Tailwind CSS compatible    | ✅                        | ⚠️                |
-| Admin UI                   | ✅                        | ✅                |
-| Custom JS events           | ✅                        | ❌                |
-| Cookie-based dismissal     | ✅ PHP + JS               | ⚠️ JS only        |
-| Driver.js up to date       | ✅                        | ⚠️                |
-| Requires Drupal toolbar    | ❌ Not required           | ✅ Required       |
-
----
+> **Tip:** Place the block in a visible region such as the sidebar or
+> footer so users can easily find and relaunch the tour at any time.
 
 ## Troubleshooting
 
-**Driver.js files not found (`web/libraries/driver.js/` is empty)**
-Run `composer install` and verify that `oomphinc/composer-installers-extender` is installed
-and the `installer-paths` configuration includes `"type:npm-asset"`.
+**The tour does not appear.**
+- Confirm the user role has the **Access guided tour** permission.
+- Check the library status at
+  **Administration > Reports > Status report**.
+- Clear the cache: `drush cr`.
 
-**Tour does not appear**
-- Verify the tour is enabled in the admin UI.
-- Check the route name matches exactly (use `drush route` to list routes).
-- Check the role matches the current user.
-- Open DevTools → Application → Cookies and confirm no `guided_tour_dismissed_*` cookie exists.
-
-**Tour starts before Web Components render**
-Set `wait_for_wc: true` in the tour YAML and ensure your components use standard
-Custom Elements v1 (`customElements.define()`).
-
----
+**Styles are broken or missing.**
+- Verify `/libraries/driver.js/dist/driver.css` exists.
+- Run `drush cr` to rebuild the asset cache.
 
 ## Maintainers
 
-- [Your Drupal.org username](https://www.drupal.org/u/your-username)
+- [Alejandro Pérez](https://www.drupal.org/u/alejandropr23)

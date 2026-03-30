@@ -2,7 +2,7 @@ driverjs:
   version: "1"
   license:
     name: MIT
-    url: https://github.com/kamranahmedse/driver.js/blob/master/LICENSE
+    url: https://github.com/kamranahmedse/driver.js/blob/master/license
     gpl-compatible: true
   js:
     js/dist/vendor.js:
