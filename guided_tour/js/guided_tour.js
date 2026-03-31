@@ -1,12 +1,12 @@
 /**
  * @file
- * Inicializa Driver.js. Soporta:
- * - Arranque automático (autoPlay) o solo bajo demanda (botón replay)
- * - Botón #guided-tour-replay-btn para relanzar el tour en cualquier momento
+ * Initializes Driver.js. Supports:
+ * - Automatic startup (autoPlay) or on-demand only (replay button)
+ * - #guided-tour-replay-btn button to relaunch the tour at any time
  * - Web Components (waitForWC via customElements.whenDefined)
- * - Shadow DOM piercing con sintaxis "hostSelector >> shadowSelector"
- * - Cookie de dismissal con opción de borrarla desde el botón
- * - 👻 Creación dinámica de elementos fantasmas para soporte Shadow DOM
+ * - Shadow DOM piercing with "hostSelector >> shadowSelector" syntax
+ * - Dismissal cookie with option to clear it from the button
+ * - 👻 Dynamic creation of ghost elements for Shadow DOM support
  */
 
 (function (Drupal, drupalSettings, once) {
@@ -21,11 +21,11 @@
   let ghostListenersBound = false;
 
   /**
-   * Recalcula las coordenadas de todos los fantasmas activos.
+   * Recalculates the coordinates of all active ghost elements.
    */
   function updateGhosts() {
     if (!activeGhosts.length) return;
-    
+
     activeGhosts.forEach(({ shadowEl, ghostEl }) => {
       const rect = shadowEl.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) return;
@@ -38,15 +38,15 @@
   }
 
   /**
-   * Crea un fantasma transparente en el Light DOM que replica al del Shadow DOM.
+   * Creates a transparent ghost element in the Light DOM that mirrors the Shadow DOM one.
    */
   function createGhostFor(shadowEl) {
     const ghostEl = document.createElement('div');
     ghostEl.className = 'guided-tour-ghost';
     ghostEl.style.position = 'absolute';
-    ghostEl.style.pointerEvents = 'none'; // Muy importante para no bloquear clics
-    ghostEl.style.zIndex = '-1'; // Para que no interfiera visualmente si no hay overlay
-    
+    ghostEl.style.pointerEvents = 'none';
+    ghostEl.style.zIndex = '-1';
+
     document.body.appendChild(ghostEl);
     activeGhosts.push({ shadowEl, ghostEl });
 
@@ -56,18 +56,17 @@
       ghostListenersBound = true;
     }
 
-    // Calcular posición inicial
     updateGhosts();
     return ghostEl;
   }
 
   /**
-   * Elimina los fantasmas y los listeners de la ventana.
+   * Removes the ghost elements and window listeners.
    */
   function cleanupGhosts() {
     activeGhosts.forEach(({ ghostEl }) => ghostEl.remove());
     activeGhosts = [];
-    
+
     if (ghostListenersBound) {
       window.removeEventListener('resize', updateGhosts);
       window.removeEventListener('scroll', updateGhosts);
@@ -100,7 +99,7 @@
       if (i === parts.length - 1) return el;
 
       if (!el.shadowRoot) {
-        console.warn(`[GuidedTour] El elemento "${parts[i]}" no tiene shadowRoot. No se puede perforar.`);
+        console.warn(`[GuidedTour] The element "${parts[i]}" does not have a shadowRoot. Cannot pierce.`);
         return null;
       }
       context = el.shadowRoot;
@@ -182,9 +181,7 @@
       el.classList.remove('driver-active-element');
     });
     document.body.classList.remove('driver-active', 'driver-fade', 'driver-simple');
-    
-    // 👻 Limpiamos los fantasmas al destruir el driver
-    cleanupGhosts(); 
+    cleanupGhosts();
   }
 
   // ── Web Components ──────────────────────────────────────────────────────
@@ -200,7 +197,7 @@
           : selector;
 
         if (wcRegex.test(hostSelector)) {
-          return customElements.whenDefined(hostSelector.replace(/[.#\[\]].*/,''));
+          return customElements.whenDefined(hostSelector.replace(/[.#\[\]].*/, ''));
         }
         const match = hostSelector.match(wcRegex);
         return match ? customElements.whenDefined(match[0]) : Promise.resolve();
@@ -220,13 +217,13 @@
     return `
       <div class="guided-tour__progress-dots">
         ${Array.from({ length: total }, (_, i) => {
-          const cls = i === currentIndex
-            ? 'guided-tour__progress-dot guided-tour__progress-dot--active'
-            : i < currentIndex
-              ? 'guided-tour__progress-dot guided-tour__progress-dot--past'
-              : 'guided-tour__progress-dot';
-          return `<div class="${cls}"></div>`;
-        }).join('')}
+      const cls = i === currentIndex
+        ? 'guided-tour__progress-dot guided-tour__progress-dot--active'
+        : i < currentIndex
+          ? 'guided-tour__progress-dot guided-tour__progress-dot--past'
+          : 'guided-tour__progress-dot';
+      return `<div class="${cls}"></div>`;
+    }).join('')}
       </div>
     `;
   }
@@ -256,9 +253,9 @@
         <div class="guided-tour__step-indicator-dot"></div>
         <span class="guided-tour__step-indicator-text">
           ${Drupal.t('Step @current of @total', {
-            '@current': meta.index + 1,
-            '@total': meta.total,
-          })}
+        '@current': meta.index + 1,
+        '@total': meta.total,
+      })}
         </span>
       `;
       title.insertAdjacentElement('beforebegin', indicator);
@@ -277,7 +274,7 @@
 
     if (previousButton) {
       if (backButton) {
-        previousButton.textContent = backButton.text || Drupal.t('Anterior');
+        previousButton.textContent = backButton.text || Drupal.t('Previous');
         previousButton.style.display = '';
       }
       else {
@@ -287,7 +284,7 @@
 
     if (nextButton) {
       if (nextConfigButton) {
-        nextButton.textContent = nextConfigButton.text || (meta.isLast ? Drupal.t('Finalizar') : Drupal.t('Siguiente'));
+        nextButton.textContent = nextConfigButton.text || (meta.isLast ? Drupal.t('Finish') : Drupal.t('Next'));
         nextButton.style.display = '';
       }
       else {
@@ -362,7 +359,7 @@
           align: 'center',
           showButtons,
           popoverClass: 'guided-tour__popover',
-          progressText: Drupal.t('Paso @current de @total', {
+          progressText: Drupal.t('Step @current of @total', {
             '@current': index + 1,
             '@total': total,
           }),
@@ -383,12 +380,10 @@
         if (isShadowSelector(selector)) {
           const resolvedEl = queryShadow(selector);
           if (resolvedEl) {
-            // 👻 En lugar de pasar el nodo real atrapado en el Shadow DOM, 
-            // le pasamos el fantasma anclado al Light DOM
             step.element = createGhostFor(resolvedEl);
           }
           else {
-            console.warn(`[GuidedTour] Shadow selector no resuelto: "${selector}"`);
+            console.warn(`[GuidedTour] Shadow selector not resolved: "${selector}"`);
             step.element = selector.split(' >> ')[0].trim();
           }
         }
@@ -436,13 +431,11 @@
       steps: buildSteps(config),
       onHighlighted(element, step) {
         if (step && step.element && typeof step.element === 'string' && !document.querySelector(step.element)) {
-          console.warn(`[GuidedTour] Elemento no encontrado: "${step.element}"`);
+          console.warn(`[GuidedTour] Element not found: "${step.element}"`);
         }
-        
-        // 👻 Forzamos una actualización de fantasmas por si la pantalla se movió
-        // justo antes de este paso durante el smoothScroll.
-        updateGhosts(); 
-        
+
+        updateGhosts();
+
         updatePopover(step);
       },
       onDestroyed() {
@@ -497,7 +490,7 @@
         const startTour = async () => {
           if (activeTour) {
             activeTourFinishReason = 'restart';
-            activeTour.destroy(); // Esto llamará automáticamente a cleanupGhosts()
+            activeTour.destroy();
             activeTour = null;
           }
 

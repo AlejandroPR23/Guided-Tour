@@ -1,9 +1,9 @@
 /**
  * @file
- * Vendor bundle para guided_tour.
+ * Vendor bundle for guided_tour.
  *
- * Importa driver.js y lo expone en window.driver.js.driver
- * para mantener compatibilidad con el detector en guided_tour.js:
+ * Imports driver.js and exposes it on window.driver.js.driver
+ * to maintain compatibility with the detector in guided_tour.js:
  *
  *   window.driver?.js?.driver  ← factory function
  */

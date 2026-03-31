@@ -10,14 +10,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Bloque con un botón para relanzar el tour de la página actual.
+ * Block with a button to relaunch the current page's tour.
  *
- * Colócalo en cualquier región del tema (header, sidebar, footer…).
- * Solo aparece en las páginas donde hay un tour configurado.
+ * Place it in any theme region (header, sidebar, footer…).
+ * Only appears on pages where a tour is configured.
  */
 #[Block(
   id: 'guided_tour_trigger',
-  admin_label: new TranslatableMarkup('Botón de tour guiado'),
+  admin_label: new TranslatableMarkup('Guided Tour Trigger'),
   category: new TranslatableMarkup('Guided Tour'),
 )]
 class TourTriggerBlock extends BlockBase {
@@ -27,7 +27,7 @@ class TourTriggerBlock extends BlockBase {
    */
   public function defaultConfiguration(): array {
     return [
-      'button_label' => '¿Necesitas ayuda? Ver tour',
+      'button_label' => 'Need help? Take the tour!',
       'button_style' => 'button',
       'icon'         => TRUE,
     ] + parent::defaultConfiguration();
@@ -42,26 +42,26 @@ class TourTriggerBlock extends BlockBase {
 
     $form['button_label'] = [
       '#type'          => 'textfield',
-      '#title'         => $this->t('Texto del botón'),
+      '#title'         => $this->t('Button text'),
       '#default_value' => $config['button_label'],
       '#required'      => TRUE,
     ];
 
     $form['button_style'] = [
       '#type'          => 'select',
-      '#title'         => $this->t('Estilo visual'),
+      '#title'         => $this->t('Visual style'),
       '#options'       => [
-        'button' => $this->t('Botón primario'),
-        'link'   => $this->t('Enlace'),
-        'fab-derecha'    => $this->t('Botón flotante (FAB)'),
-        'fab-izquierda'  => $this->t('Botón flotante (FAB) - izquierda'),
+        'button' => $this->t('Primary button'),
+        'link'   => $this->t('Link'),
+        'fab-derecha'    => $this->t('Floating action button (FAB)'),
+        'fab-izquierda'  => $this->t('Floating action button (FAB) - left'),
       ],
       '#default_value' => $config['button_style'],
     ];
 
     $form['icon'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Mostrar icono de ayuda'),
+      '#title'         => $this->t('Show icon of question mark'),
       '#default_value' => $config['icon'],
     ];
 
@@ -80,9 +80,9 @@ class TourTriggerBlock extends BlockBase {
   /**
    * {@inheritdoc}
    *
-   * El bloque solo se renderiza cuando drupalSettings.guidedTour existe,
-   * es decir cuando hay un tour activo para esta página y usuario.
-   * El JS se encarga de mostrarlo/ocultarlo según corresponda.
+   * The block is only rendered when drupalSettings.guidedTour exists,
+   * i.e. when there is an active tour for this page and user.
+   * The JS handles showing/hiding it as appropriate.
    */
   public function build(): array {
     $config = $this->configuration;

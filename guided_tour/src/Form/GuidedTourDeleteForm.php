@@ -18,7 +18,7 @@ class GuidedTourDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion(): TranslatableMarkup {
-    return $this->t('¿Eliminar el tour <em>@label</em>?', ['@label' => $this->entity->label()]);
+    return $this->t('Delete the tour <em>@label</em>?', ['@label' => $this->entity->label()]);
   }
 
   /**
@@ -32,7 +32,7 @@ class GuidedTourDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText(): TranslatableMarkup {
-    return $this->t('Eliminar');
+    return $this->t('Delete');
   }
 
   /**
@@ -40,7 +40,7 @@ class GuidedTourDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void { //phpcs:ignore
     $this->entity->delete();
-    $this->messenger()->addStatus($this->t('Tour <em>@label</em> eliminado.', ['@label' => $this->entity->label()]));
+    $this->messenger()->addStatus($this->t('Tour <em>@label</em> deleted.', ['@label' => $this->entity->label()]));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

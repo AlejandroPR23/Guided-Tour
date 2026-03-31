@@ -1,5 +1,2 @@
-# Dependencias npm — nunca se suben al repo
 node_modules/
- 
-# Vite genera esto en desarrollo, no es necesario en el repo
 js/dist/.vite/

@@ -10,11 +10,11 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\guided_tour\Entity\GuidedTourInterface;
 
 /**
- * Resuelve qué tour mostrar para una ruta y usuario dados.
+ * Resolves which tour to display for a given route and user.
  *
- * Lee desde Config Entities.
+ * Reads from Config Entities.
  *
- * (editables desde la UI de admin).
+ * (editable from the admin UI).
  */
 class TourManager {
 
@@ -24,7 +24,7 @@ class TourManager {
   ) {}
 
   /**
-   * Retorna la entidad GuidedTour que aplica, o NULL si ninguna.
+   * Returns the GuidedTour entity that applies, or NULL if none.
    */
   public function getTourForRouteAndUser(string $route_name, AccountInterface $account): ?GuidedTourInterface {
     $role    = $this->getPrimaryRole($account);
@@ -34,13 +34,11 @@ class TourManager {
     $tours = $storage->loadByProperties(['status' => TRUE]);
 
     foreach ($tours as $tour) {
-      // ── Filtro de ruta ────────────────────────────────────────────────
       $routes = $tour->getRoutes();
       if (!empty($routes) && !in_array($route_name, $routes, TRUE)) {
         continue;
       }
 
-      // ── Filtro de route_params ────────────────────────────────────────
       foreach ($tour->getRouteParams() as $param => $value) {
         $actual = $this->routeMatch->getRawParameter($param);
         if ((string) $actual !== (string) $value) {
@@ -48,7 +46,6 @@ class TourManager {
         }
       }
 
-      // ── Filtro de rol ─────────────────────────────────────────────────
       $allowed = $tour->getRoles();
       if (!empty($allowed) && !in_array($role, $allowed, TRUE)) {
         continue;
@@ -61,11 +58,11 @@ class TourManager {
   }
 
   /**
-   * Determina el rol "principal" del usuario,
+   * Determines the "primary" role of the user,
    *
-   * Para usarlo en la lógica de tours.
+   * To use in the tours logic.
    *
-   * Si tiene varios roles, se asigna el que esté más arriba.
+   * If they have multiple roles, the one with higher priority is assigned.
    */
   protected function getPrimaryRole(AccountInterface $account): string {
     if ($account->isAnonymous()) {

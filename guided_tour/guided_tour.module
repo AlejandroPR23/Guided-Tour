@@ -16,10 +16,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 function guided_tour_help(string $route_name, RouteMatchInterface $route_match): string { //phpcs:ignore
   return match($route_name) {
     'help.page.guided_tour' =>
-    '<p>' . t('Tours guiados con Driver.js.
-    Gestiona los tours en <a href=":url">
-    Configuración > Interfaz de usuario > Tours guiados</a>.', [
-      ':url' => '/admin/config/user-interface/guided-tour',
+    '<p>' . t('Guided tours with Driver.js. Administer the guided tours from the site in: <a href=":url">Guided Tours</a>.', [
+    ':url' => '/admin/config/user-interface/guided-tour',
     ]) . '</p>',
     default => '',
   };
@@ -31,8 +29,8 @@ function guided_tour_help(string $route_name, RouteMatchInterface $route_match):
 function guided_tour_permission(): array {
   return [
     'administer guided tours' => [
-      'title'           => t('Administrar tours guiados'),
-      'description'     => t('Crear, editar y eliminar tours.'),
+      'title'           => t('Administer guided tours'),
+      'description'     => t('Create, edit and delete tours.'),
       'restrict access' => TRUE,
     ],
   ];

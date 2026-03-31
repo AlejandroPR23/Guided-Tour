@@ -51,7 +51,7 @@ class GuidedTourForm extends EntityForm {
     // ── Información básica ────────────────────────────────────────────────
     $form['label'] = [
       '#type'          => 'textfield',
-      '#title'         => $this->t('Nombre del tour'),
+      '#title'         => $this->t('Name of the tour'),
       '#default_value' => $tour->label(),
       '#required'      => TRUE,
       '#maxlength'     => 128,
@@ -69,23 +69,23 @@ class GuidedTourForm extends EntityForm {
 
     $form['status'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Habilitado'),
+      '#title'         => $this->t('Enabled'),
       '#default_value' => $tour->status(),
     ];
 
     // ── Rutas ─────────────────────────────────────────────────────────────
     $form['routing'] = [
       '#type'  => 'details',
-      '#title' => $this->t('Rutas y condiciones'),
+      '#title' => $this->t('Routes and access conditions'),
       '#open'  => TRUE,
     ];
 
     $form['routing']['routes_text'] = [
       '#type'          => 'textarea',
-      '#title'         => $this->t('Rutas de Drupal'),
+      '#title'         => $this->t('Routes of Drupal'),
       
       '#description'   => $this->t(
-        'Una ruta por línea. Usa el nombre interno de ruta de Drupal, ej: <code>entity.node.canonical</code>, <code>&lt;front&gt;</code>. Deja vacío para todas las rutas.'
+        'One route for line. Use the internal route name of Drupal, e.g. <code>entity.node.canonical</code>, <code>&lt;front&gt;</code>. Leave empty for all routes.'
       ),
       '#default_value' => implode("\n", $tour->getRoutes()),
       '#rows'          => 4,
@@ -93,9 +93,9 @@ class GuidedTourForm extends EntityForm {
 
     $form['routing']['route_params_text'] = [
       '#type'          => 'textarea',
-      '#title'         => $this->t('Parámetros de ruta'),
+      '#title'         => $this->t('Route parameters'),
       '#description'   => $this->t(
-        'Un parámetro por línea en formato <code>clave: valor</code>. Ej: <code>node: 2707</code>. Deja vacío para no filtrar por parámetro.'
+        'One parameter per line in <code>key: value</code> format. E.g. <code>node: 2707</code>. Leave empty to not filter by parameter.'
       ),
       '#default_value' => $this->routeParamsToText($tour->getRouteParams()),
       '#rows'          => 3,
@@ -103,7 +103,7 @@ class GuidedTourForm extends EntityForm {
 
     // ── Roles ─────────────────────────────────────────────────────────────
     $roles        = $this->roleStorage->loadMultiple();
-    $role_options = ['anonymous' => $this->t('Anónimo')];
+    $role_options = ['anonymous' => $this->t('Anonymous')];
     foreach ($roles as $role_id => $role) {
       if (!in_array($role_id, ['anonymous'], TRUE)) {
         $role_options[$role_id] = $role->label();
@@ -112,8 +112,8 @@ class GuidedTourForm extends EntityForm {
 
     $form['routing']['roles'] = [
       '#type'          => 'checkboxes',
-      '#title'         => $this->t('Roles que ven el tour'),
-      '#description'   => $this->t('Deja todo sin marcar para mostrar a todos los roles.'),
+      '#title'         => $this->t('Roles that see the tour'),
+      '#description'   => $this->t('Leave all unchecked to show to all roles.'),
       '#options'       => $role_options,
       '#default_value' => $tour->getRoles(),
     ];
@@ -121,14 +121,14 @@ class GuidedTourForm extends EntityForm {
     // ── Opciones de comportamiento ─────────────────────────────────────────
     $form['behavior'] = [
       '#type'  => 'details',
-      '#title' => $this->t('Comportamiento'),
+      '#title' => $this->t('Behavior'),
       '#open'  => TRUE,
     ];
 
     $form['behavior']['cookie_days'] = [
       '#type'          => 'number',
-      '#title'         => $this->t('Días de dismissal'),
-      '#description'   => $this->t('Cuántos días se recuerda que el usuario ya vio el tour (cookie). Usa 0 para no recordar.'),
+      '#title'         => $this->t('Dismissal days'),
+      '#description'   => $this->t('How many days to remember that the user has seen the tour (cookie). Use 0 to not remember.'),
       '#default_value' => $tour->getCookieDays(),
       '#min'           => 0,
       '#max'           => 3650,
@@ -136,31 +136,31 @@ class GuidedTourForm extends EntityForm {
 
     $form['behavior']['wait_for_wc'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Esperar a Web Components'),
-      '#description'   => $this->t('Activa si tus elementos son Web Components (Storybook/Lit). El tour esperará a que hagan upgrade antes de iniciar.'),
+      '#title'         => $this->t('Wait for Web Components'),
+      '#description'   => $this->t('Activate if your elements are Web Components (Storybook/Lit). The tour will wait for them to upgrade before starting.'),
       '#default_value' => $tour->isWaitForWc(),
     ];
 
     $options = $tour->getOptions();
     $form['behavior']['use_modal_overlay'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Usar overlay oscuro'),
-      '#description'   => $this->t('Muestra un overlay semitransparente resaltando el elemento activo.'),
+      '#title'         => $this->t('Use dark overlay'),
+      '#description'   => $this->t('Shows a semi-transparent overlay highlighting the active element.'),
       '#default_value' => $options['useModalOverlay'] ?? TRUE,
     ];
 
     // ── Pasos del tour ─────────────────────────────────────────────────────
     $form['steps_wrapper'] = [
       '#type'  => 'details',
-      '#title' => $this->t('Pasos del tour'),
+      '#title' => $this->t('Steps of the tour'),
       '#open'  => TRUE,
     ];
 
     $form['steps_wrapper']['steps_yaml'] = [
       '#type'          => 'textarea',
-      '#title'         => $this->t('Pasos (formato YAML)'),
+      '#title'         => $this->t('Steps (YAML format)'),
       '#description'   => $this->t(
-        'Define los pasos en YAML. Cada paso admite: <code>id</code>, <code>title</code>, <code>text</code>, <code>attachTo</code> (element + on), <code>buttons</code> (type: next/back/cancel). <a href="#yaml-help">Ver ejemplo</a>.'
+        'Define the steps in YAML. Each step supports: <code>id</code>, <code>title</code>, <code>text</code>, <code>attachTo</code> (element + on), <code>buttons</code> (type: next/back/cancel). <a href="#yaml-help">View example</a>.'
       ),
       '#default_value' => $this->stepsToYaml($tour->getSteps()),
       '#rows'          => 20,
@@ -170,7 +170,7 @@ class GuidedTourForm extends EntityForm {
     // Ejemplo colapsado como referencia rápida.
     $form['steps_wrapper']['yaml_help'] = [
       '#type'   => 'details',
-      '#title'  => $this->t('Ejemplo de pasos YAML'),
+      '#title'  => $this->t('YAML Steps Example'),
       '#open'   => FALSE,
       '#id'     => 'yaml-help',
       'example' => [
@@ -196,11 +196,11 @@ class GuidedTourForm extends EntityForm {
       try {
         $parsed = Yaml::parse($yaml);
         if (!is_array($parsed)) {
-          $form_state->setErrorByName('steps_yaml', $this->t('El YAML debe ser una lista de pasos.'));
+          $form_state->setErrorByName('steps_yaml', $this->t('The YAML must be a list of steps.'));
         }
       }
       catch (ParseException $e) {
-        $form_state->setErrorByName('steps_yaml', $this->t('YAML inválido: @error', ['@error' => $e->getMessage()]));
+        $form_state->setErrorByName('steps_yaml', $this->t('Invalid YAML: @error', ['@error' => $e->getMessage()]));
       }
     }
 
@@ -213,7 +213,7 @@ class GuidedTourForm extends EntityForm {
       catch (ParseException $e) {
         $form_state->setErrorByName(
           'route_params',
-          $this->t('Parámetros inválidos: @error',
+          $this->t('Invalid parameters: @error',
           ['@error' => $e->getMessage()]));
       }
     }
@@ -254,8 +254,8 @@ class GuidedTourForm extends EntityForm {
 
     $this->messenger()->addStatus(
       $status === SAVED_NEW
-        ? $this->t('Tour <em>@label</em> creado correctamente.', ['@label' => $tour->label()])
-        : $this->t('Tour <em>@label</em> actualizado correctamente.', ['@label' => $tour->label()])
+        ? $this->t('Tour <em>@label</em> created successfully.', ['@label' => $tour->label()])
+        : $this->t('Tour <em>@label</em> updated successfully.', ['@label' => $tour->label()])
     );
 
     $form_state->setRedirectUrl($tour->toUrl('collection'));
@@ -303,28 +303,28 @@ class GuidedTourForm extends EntityForm {
    */
   private function getYamlExample(): string {
     return <<<YAML
-- id: paso-1
-  title: 'Título del primer paso'
-  text: 'Descripción breve de lo que el usuario ve aquí.'
+- id: step-1
+  title: 'Title of the first step'
+  text: 'Brief description of what the user sees here.'
   attachTo:
-    element: '[data-tour="mi-componente"]'
+    element: '[data-tour="my-component"]'
     on: bottom
   buttons:
-    - text: 'Siguiente'
+    - text: 'Next'
       type: next
-    - text: 'Omitir tour'
+    - text: 'Skip tour'
       type: cancel
 
-- id: paso-2
-  title: 'Segundo paso'
-  text: 'Más información sobre esta sección.'
+- id: step-2
+  title: 'Title of the second step'
+  text: 'More information about this section.'
   attachTo:
-    element: '[data-tour="otro-componente"]'
+    element: '[data-tour="other-component"]'
     on: right
   buttons:
-    - text: 'Anterior'
+    - text: 'Previous'
       type: back
-    - text: '¡Listo!'
+    - text: 'Done'
       type: next
 YAML;
   }

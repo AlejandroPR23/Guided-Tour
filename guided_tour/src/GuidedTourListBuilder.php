@@ -8,7 +8,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Tabla de listado de tours en /admin/config/user-interface/guided-tour.
+ * Table of listed tours in /admin/config/user-interface/guided-tour.
  */
 class GuidedTourListBuilder extends ConfigEntityListBuilder {
 
@@ -17,11 +17,11 @@ class GuidedTourListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader(): array {
     return [
-      'label'   => $this->t('Nombre'),
+      'label'   => $this->t('Name'),
       'id'      => $this->t('ID'),
-      'routes'  => $this->t('Rutas'),
+      'routes'  => $this->t('Routes'),
       'roles'   => $this->t('Roles'),
-      'status'  => $this->t('Estado'),
+      'status'  => $this->t('Status'),
     ] + parent::buildHeader();
   }
 
@@ -36,9 +36,9 @@ class GuidedTourListBuilder extends ConfigEntityListBuilder {
     return [
       'label'  => $entity->label(),
       'id'     => $entity->id(),
-      'routes' => empty($routes) ? $this->t('Todas') : implode(', ', $routes),
-      'roles'  => empty($roles) ? $this->t('Todos') : implode(', ', $roles),
-      'status' => $entity->status() ? $this->t('Habilitado') : $this->t('Deshabilitado'),
+      'routes' => empty($routes) ? $this->t('All') : implode(', ', $routes),
+      'roles'  => empty($roles) ? $this->t('All') : implode(', ', $roles),
+      'status' => $entity->status() ? $this->t('Enabled') : $this->t('Disabled'),
     ] + parent::buildRow($entity);
   }
 
