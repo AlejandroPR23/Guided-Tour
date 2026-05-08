@@ -46,6 +46,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "status",
  *     "routes",
  *     "route_params",
+ *     "bundle_filter",
  *     "roles",
  *     "cookie_days",
  *     "wait_for_wc",
@@ -78,6 +79,13 @@ class GuidedTour extends ConfigEntityBase implements GuidedTourInterface {
  * @var array Route parameters (e.g. ['node' => '2707']).
  */
   protected array $route_params = [];
+
+  /**
+ * Aditional filter to specify the bundle for which this tour applies (e.g. content type).
+ *
+ * @var array
+ */
+  protected array $bundle_filter = [];
 
     /**
    * Roles that see the tour.
@@ -163,4 +171,10 @@ class GuidedTour extends ConfigEntityBase implements GuidedTourInterface {
     return $this->steps;
   }
 
+  /**
+ * {@inheritdoc}
+ */
+  public function getBundleFilter(): array {
+    return $this->bundle_filter;
+  }
 }

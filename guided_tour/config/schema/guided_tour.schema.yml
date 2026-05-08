@@ -19,6 +19,16 @@ guided_tour.tour.*:
     route_params:
       type: mapping
       label: 'Parámetros de ruta'
+    bundle_filter:
+      type: mapping
+      label: 'Bundle filter'
+      mapping:
+        entity_type:
+          type: string
+          label: 'Entity type'
+        bundle:
+          type: string
+          label: 'Bundle (content type)'
     roles:
       type: sequence
       label: 'Roles'

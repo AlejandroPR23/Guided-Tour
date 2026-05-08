@@ -118,6 +118,38 @@ class GuidedTourForm extends EntityForm {
       '#default_value' => $tour->getRoles(),
     ];
 
+    $bundle_filter = $tour->getBundleFilter();
+    $form['bundle'] = [
+  '#type'  => 'details',
+  '#title' => $this->t('Filter by content type (bundle)'),
+  '#open'  => !empty($bundle_filter),
+];
+
+$form['bundle']['bundle_entity_type'] = [
+  '#type'          => 'textfield',
+  '#title'         => $this->t('Entity type'),
+  '#description'   => $this->t(
+    'Internal entity type machine name. Use <code>node</code> for content, <code>taxonomy_term</code> for terms, etc.'
+  ),
+  '#default_value' => $bundle_filter['entity_type'] ?? '',
+  '#placeholder'   => 'node',
+];
+
+$form['bundle']['bundle_name'] = [
+  '#type'          => 'textfield',
+  '#title'         => $this->t('Bundle'),
+  '#description'   => $this->t(
+    'Machine name of the bundle. E.g. <code>course</code>, <code>article</code>, <code>tags</code>.'
+  ),
+  '#default_value' => $bundle_filter['bundle'] ?? '',
+  '#placeholder'   => 'course',
+  '#states'        => [
+    'visible' => [
+      ':input[name="bundle_entity_type"]' => ['filled' => TRUE],
+    ],
+  ],
+];
+
     // ── Opciones de comportamiento ─────────────────────────────────────────
     $form['behavior'] = [
       '#type'  => 'details',
@@ -233,6 +265,14 @@ class GuidedTourForm extends EntityForm {
     // Procesar route_params (YAML inline → array).
     $params_raw = $form_state->getValue('route_params_text', '');
     $tour->set('route_params', !empty($params_raw) ? (Yaml::parse($params_raw) ?? []) : []);
+
+    $entity_type = trim((string) $form_state->getValue('bundle_entity_type'));
+    $bundle_name = trim((string) $form_state->getValue('bundle_name'));
+
+    $tour->set('bundle_filter', ($entity_type && $bundle_name)
+      ? ['entity_type' => $entity_type, 'bundle' => $bundle_name]
+      : []
+    );
 
     // Procesar roles (filtrar los no marcados).
     $roles = array_filter($form_state->getValue('roles', []));

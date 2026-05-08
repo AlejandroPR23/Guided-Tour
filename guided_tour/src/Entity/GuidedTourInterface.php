@@ -22,6 +22,14 @@ interface GuidedTourInterface extends ConfigEntityInterface {
   public function getRouteParams(): array;
 
   /**
+ * Returns the bundle filter for which this tour is applicable.
+ *
+ * @return array
+ *   Array with keys 'entity_type' and 'bundle', or empty if no filter is set.
+ */
+  public function getBundleFilter(): array;
+
+  /**
    * Returns the roles for which this tour is applicable.
    */
   public function getRoles(): array;

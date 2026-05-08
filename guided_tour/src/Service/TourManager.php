@@ -46,6 +46,19 @@ class TourManager {
         }
       }
 
+      $bundle_filter = $tour->getBundleFilter();
+      if (!empty($bundle_filter['entity_type']) && !empty($bundle_filter['bundle'])) {
+        $entity_type = $bundle_filter['entity_type'];
+        $bundle      = $bundle_filter['bundle'];
+
+        /** @var \Drupal\Core\Entity\EntityInterface|null $entity */
+        $entity = $this->routeMatch->getParameter($entity_type);
+
+        if (!$entity || !method_exists($entity, 'bundle') || $entity->bundle() !== $bundle) {
+          continue;
+        }
+      }
+
       $allowed = $tour->getRoles();
       if (!empty($allowed) && !in_array($role, $allowed, TRUE)) {
         continue;
