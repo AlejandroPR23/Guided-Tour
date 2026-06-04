@@ -38,26 +38,26 @@ class TourTriggerBlock extends BlockBase {
 
     $form['button_label'] = [
       '#type'          => 'textfield',
-      '#title'         => $this->t('Button text'),
+      '#title'         => $this->t('Button text', [], ['context' => 'guided_tour']),
       '#default_value' => $config['button_label'],
       '#required'      => TRUE,
     ];
 
     $form['button_style'] = [
       '#type'          => 'select',
-      '#title'         => $this->t('Visual style'),
+      '#title'         => $this->t('Visual style', [], ['context' => 'guided_tour']),
       '#options'       => [
-        'button' => $this->t('Primary button'),
-        'link'   => $this->t('Link'),
-        'fab-derecha'    => $this->t('Floating action button (FAB)'),
-        'fab-izquierda'  => $this->t('Floating action button (FAB) - left'),
+        'button' => $this->t('Primary button', [], ['context' => 'guided_tour']),
+        'link'   => $this->t('Link', [], ['context' => 'guided_tour']),
+        'fab-derecha'    => $this->t('Floating action button (FAB)', [], ['context' => 'guided_tour']),
+        'fab-izquierda'  => $this->t('Floating action button (FAB) - left', [], ['context' => 'guided_tour']),
       ],
       '#default_value' => $config['button_style'],
     ];
 
     $form['icon'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Show icon of question mark'),
+      '#title'         => $this->t('Show icon of question mark', [], ['context' => 'guided_tour']),
       '#default_value' => $config['icon'],
     ];
 

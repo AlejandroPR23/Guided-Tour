@@ -18,7 +18,7 @@ function guided_tour_help(string $route_name, RouteMatchInterface $route_match):
     'help.page.guided_tour' =>
     '<p>' . t('Guided tours with Driver.js. Administer the guided tours from the site in: <a href=":url">Guided Tours</a>.', [
     ':url' => '/admin/config/user-interface/guided-tour',
-    ]) . '</p>',
+    ],['context' => 'guided_tour']) . '</p>',
     default => '',
   };
 }
@@ -29,8 +29,8 @@ function guided_tour_help(string $route_name, RouteMatchInterface $route_match):
 function guided_tour_permission(): array {
   return [
     'administer guided tours' => [
-      'title'           => t('Administer guided tours'),
-      'description'     => t('Create, edit and delete tours.'),
+      'title'           => t('Administer guided tours',[], ['context' => 'guided_tour']),
+      'description'     => t('Create, edit and delete tours.',[], ['context' => 'guided_tour']),
       'restrict access' => TRUE,
     ],
   ];

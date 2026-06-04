@@ -17,11 +17,11 @@ class GuidedTourListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader(): array {
     return [
-      'label'   => $this->t('Name'),
-      'id'      => $this->t('ID'),
-      'routes'  => $this->t('Routes'),
-      'roles'   => $this->t('Roles'),
-      'status'  => $this->t('Status'),
+      'label'   => $this->t('Name', [], ['context' => 'guided_tour']),
+      'id'      => $this->t('ID', [], ['context' => 'guided_tour']),
+      'routes'  => $this->t('Routes', [], ['context' => 'guided_tour']),
+      'roles'   => $this->t('Roles', [], ['context' => 'guided_tour']),
+      'status'  => $this->t('Status', [], ['context' => 'guided_tour']),
     ] + parent::buildHeader();
   }
 
@@ -36,9 +36,9 @@ class GuidedTourListBuilder extends ConfigEntityListBuilder {
     return [
       'label'  => $entity->label(),
       'id'     => $entity->id(),
-      'routes' => empty($routes) ? $this->t('All') : implode(', ', $routes),
-      'roles'  => empty($roles) ? $this->t('All') : implode(', ', $roles),
-      'status' => $entity->status() ? $this->t('Enabled') : $this->t('Disabled'),
+      'routes' => empty($routes) ? $this->t('All', [], ['context' => 'guided_tour']) : implode(', ', $routes),
+      'roles'  => empty($roles) ? $this->t('All', [], ['context' => 'guided_tour']) : implode(', ', $roles),
+      'status' => $entity->status() ? $this->t('Enabled', [], ['context' => 'guided_tour']) : $this->t('Disabled', [], ['context' => 'guided_tour']),
     ] + parent::buildRow($entity);
   }
 

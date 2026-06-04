@@ -270,7 +270,7 @@
           ${Drupal.t('Step @current of @total', {
         '@current': meta.index + 1,
         '@total': meta.total,
-      })}
+      },{ context: 'guided_tour' })}
         </span>
       `;
       title.insertAdjacentElement('beforebegin', indicator);
@@ -289,7 +289,7 @@
 
     if (previousButton) {
       if (backButton) {
-        previousButton.textContent = backButton.text || Drupal.t('Previous');
+        previousButton.textContent = backButton.text || Drupal.t('Previous',{},{ context: 'guided_tour' });
         previousButton.style.display = '';
       }
       else {
@@ -299,7 +299,7 @@
 
     if (nextButton) {
       if (nextConfigButton) {
-        nextButton.textContent = nextConfigButton.text || (meta.isLast ? Drupal.t('Finish') : Drupal.t('Next'));
+        nextButton.textContent = nextConfigButton.text || (meta.isLast ? Drupal.t('Finish',{},{ context: 'guided_tour' }) : Drupal.t('Next',{},{ context: 'guided_tour' }));
         nextButton.style.display = '';
       }
       else {
@@ -339,7 +339,7 @@
         existingCancel.remove();
       }
 
-      const cancelText = (cancelButton && cancelButton.text) || Drupal.t('Omitir tour');
+      const cancelText = (cancelButton && cancelButton.text) || Drupal.t('Skip tour',{},{ context: 'guided_tour' });
       const cancelActionButton = document.createElement('button');
       cancelActionButton.type = 'button';
       cancelActionButton.className = 'guided-tour__footer-cancel';
@@ -377,7 +377,7 @@
           progressText: Drupal.t('Step @current of @total', {
             '@current': index + 1,
             '@total': total,
-          }),
+          },{ context: 'guided_tour' }),
         },
         guidedTourMeta: {
           id: stepDef.id,
@@ -443,6 +443,8 @@
       stagePadding: 8,
       stageRadius: 8,
       popoverOffset: 34,
+      prevBtnText: Drupal.t('Previous', {}, { context: 'guided_tour' }),
+      nextBtnText: Drupal.t('Next', {}, { context: 'guided_tour' }),
       steps: buildSteps(config),
       onHighlightStarted(element) {
         document.body.classList.add('guided-tour--transitioning');

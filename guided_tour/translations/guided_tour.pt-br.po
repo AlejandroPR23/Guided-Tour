@@ -1,0 +1,216 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: guided_tour 1.0.1\n"
+"Language: pt-br\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# ── guided_tour.module ──────────────────────────────────────────────────────
+
+msgctxt "guided_tour"
+msgid "Administer guided tours"
+msgstr "Administrar tours guiados"
+
+msgctxt "guided_tour"
+msgid "Create, edit and delete tours."
+msgstr "Criar, editar e excluir tours."
+
+# ── GuidedTourForm.php ──────────────────────────────────────────────────────
+
+msgctxt "guided_tour"
+msgid "Name of the tour"
+msgstr "Nome do tour"
+
+msgctxt "guided_tour"
+msgid "Enabled"
+msgstr "Habilitado"
+
+msgctxt "guided_tour"
+msgid "Routes and access conditions"
+msgstr "Rotas e condições de acesso"
+
+msgctxt "guided_tour"
+msgid "Routes of Drupal"
+msgstr "Rotas do Drupal"
+
+msgctxt "guided_tour"
+msgid "Route parameters"
+msgstr "Parâmetros de rota"
+
+msgctxt "guided_tour"
+msgid "Anonymous"
+msgstr "Anônimo"
+
+msgctxt "guided_tour"
+msgid "Roles that see the tour"
+msgstr "Funções que visualizam o tour"
+
+msgctxt "guided_tour"
+msgid "Leave all unchecked to show to all roles."
+msgstr "Deixe todos desmarcados para exibir a todos os perfis."
+
+msgctxt "guided_tour"
+msgid "Filter by content type (bundle)"
+msgstr "Filtrar por tipo de conteúdo (bundle)"
+
+msgctxt "guided_tour"
+msgid "Entity type"
+msgstr "Tipo de entidade"
+
+msgctxt "guided_tour"
+msgid "Bundle"
+msgstr "Bundle"
+
+msgctxt "guided_tour"
+msgid "Behavior"
+msgstr "Comportamento"
+
+msgctxt "guided_tour"
+msgid "Dismissal days"
+msgstr "Dias de dispensa"
+
+msgctxt "guided_tour"
+msgid "How many days to remember that the user has seen the tour (cookie). Use 0 to not remember."
+msgstr "Quantos dias lembrar que o usuário já viu o tour (cookie). Use 0 para não lembrar."
+
+msgctxt "guided_tour"
+msgid "Wait for Web Components"
+msgstr "Aguardar Web Components"
+
+msgctxt "guided_tour"
+msgid "Activate if your elements are Web Components (Storybook/Lit). The tour will wait for them to upgrade before starting."
+msgstr "Ative se seus elementos são Web Components (Storybook/Lit). O tour aguardará a inicialização deles antes de começar."
+
+msgctxt "guided_tour"
+msgid "Use dark overlay"
+msgstr "Usar sobreposição escura"
+
+msgctxt "guided_tour"
+msgid "Shows a semi-transparent overlay highlighting the active element."
+msgstr "Exibe uma camada semitransparente destacando o elemento ativo."
+
+msgctxt "guided_tour"
+msgid "Steps of the tour"
+msgstr "Passos do tour"
+
+msgctxt "guided_tour"
+msgid "Steps (YAML format)"
+msgstr "Passos (formato YAML)"
+
+msgctxt "guided_tour"
+msgid "YAML Steps Example"
+msgstr "Exemplo de passos em YAML"
+
+msgctxt "guided_tour"
+msgid "The YAML must be a list of steps."
+msgstr "O YAML deve ser uma lista de passos."
+
+msgctxt "guided_tour"
+msgid "Invalid YAML: @error"
+msgstr "YAML inválido: @error"
+
+msgctxt "guided_tour"
+msgid "Invalid parameters: @error"
+msgstr "Parâmetros inválidos: @error"
+
+msgctxt "guided_tour"
+msgid "Tour <em>@label</em> created successfully."
+msgstr "Tour <em>@label</em> criado com sucesso."
+
+msgctxt "guided_tour"
+msgid "Tour <em>@label</em> updated successfully."
+msgstr "Tour <em>@label</em> atualizado com sucesso."
+
+# ── GuidedTourDeleteForm.php ────────────────────────────────────────────────
+
+msgctxt "guided_tour"
+msgid "Delete the tour <em>@label</em>?"
+msgstr "Excluir o tour <em>@label</em>?"
+
+msgctxt "guided_tour"
+msgid "Delete"
+msgstr "Excluir"
+
+msgctxt "guided_tour"
+msgid "Tour <em>@label</em> deleted."
+msgstr "Tour <em>@label</em> excluído."
+
+# ── GuidedTourListBuilder.php ───────────────────────────────────────────────
+
+msgctxt "guided_tour"
+msgid "Name"
+msgstr "Nome"
+
+msgctxt "guided_tour"
+msgid "Routes"
+msgstr "Rotas"
+
+msgctxt "guided_tour"
+msgid "Roles"
+msgstr "Funções"
+
+msgctxt "guided_tour"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "guided_tour"
+msgid "All"
+msgstr "Todos"
+
+msgctxt "guided_tour"
+msgid "Disabled"
+msgstr "Desabilitado"
+
+# ── TourTriggerBlock.php ────────────────────────────────────────────────────
+
+msgctxt "guided_tour"
+msgid "Button text"
+msgstr "Texto do botão"
+
+msgctxt "guided_tour"
+msgid "Visual style"
+msgstr "Estilo visual"
+
+msgctxt "guided_tour"
+msgid "Primary button"
+msgstr "Botão primário"
+
+msgctxt "guided_tour"
+msgid "Link"
+msgstr "Link"
+
+msgctxt "guided_tour"
+msgid "Floating action button (FAB)"
+msgstr "Botão de ação flutuante (FAB)"
+
+msgctxt "guided_tour"
+msgid "Floating action button (FAB) - left"
+msgstr "Botão de ação flutuante (FAB) - esquerda"
+
+msgctxt "guided_tour"
+msgid "Show icon of question mark"
+msgstr "Exibir ícone de ponto de interrogação"
+
+# ── guided_tour.js (Drupal.t) ───────────────────────────────────────────────
+
+msgctxt "guided_tour"
+msgid "Step @current of @total"
+msgstr "Passo @current de @total"
+
+msgctxt "guided_tour"
+msgid "Previous"
+msgstr "Anterior"
+
+msgctxt "guided_tour"
+msgid "Next"
+msgstr "Próximo"
+
+msgctxt "guided_tour"
+msgid "Finish"
+msgstr "Concluir"
+
+msgctxt "guided_tour"
+msgid "Skip tour"
+msgstr "Pular tour"

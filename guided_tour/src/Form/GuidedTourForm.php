@@ -51,7 +51,7 @@ class GuidedTourForm extends EntityForm {
     // ── Información básica ────────────────────────────────────────────────
     $form['label'] = [
       '#type'          => 'textfield',
-      '#title'         => $this->t('Name of the tour'),
+      '#title'         => $this->t('Name of the tour', [], ['context' => 'guided_tour']),
       '#default_value' => $tour->label(),
       '#required'      => TRUE,
       '#maxlength'     => 128,
@@ -69,23 +69,24 @@ class GuidedTourForm extends EntityForm {
 
     $form['status'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Enabled'),
+      '#title'         => $this->t('Enabled', [], ['context' => 'guided_tour']),
       '#default_value' => $tour->status(),
     ];
 
     // ── Rutas ─────────────────────────────────────────────────────────────
     $form['routing'] = [
       '#type'  => 'details',
-      '#title' => $this->t('Routes and access conditions'),
+      '#title' => $this->t('Routes and access conditions', [], ['context' => 'guided_tour']),
       '#open'  => TRUE,
     ];
 
     $form['routing']['routes_text'] = [
       '#type'          => 'textarea',
-      '#title'         => $this->t('Routes of Drupal'),
-      
+      '#title'         => $this->t('Routes of Drupal', [], ['context' => 'guided_tour']),
       '#description'   => $this->t(
-        'One route for line. Use the internal route name of Drupal, e.g. <code>entity.node.canonical</code>, <code>&lt;front&gt;</code>. Leave empty for all routes.'
+        'One route for line. Use the internal route name of Drupal, e.g. <code>entity.node.canonical</code>, <code>&lt;front&gt;</code>. Leave empty for all routes.',
+        [],
+        ['context' => 'guided_tour']
       ),
       '#default_value' => implode("\n", $tour->getRoutes()),
       '#rows'          => 4,
@@ -93,9 +94,11 @@ class GuidedTourForm extends EntityForm {
 
     $form['routing']['route_params_text'] = [
       '#type'          => 'textarea',
-      '#title'         => $this->t('Route parameters'),
+      '#title'         => $this->t('Route parameters', [], ['context' => 'guided_tour']),
       '#description'   => $this->t(
-        'One parameter per line in <code>key: value</code> format. E.g. <code>node: 2707</code>. Leave empty to not filter by parameter.'
+        'One parameter per line in <code>key: value</code> format. E.g. <code>node: 2707</code>. Leave empty to not filter by parameter.',
+        [],
+        ['context' => 'guided_tour']
       ),
       '#default_value' => $this->routeParamsToText($tour->getRouteParams()),
       '#rows'          => 3,
@@ -103,7 +106,7 @@ class GuidedTourForm extends EntityForm {
 
     // ── Roles ─────────────────────────────────────────────────────────────
     $roles        = $this->roleStorage->loadMultiple();
-    $role_options = ['anonymous' => $this->t('Anonymous')];
+    $role_options = ['anonymous' => $this->t('Anonymous', [], ['context' => 'guided_tour'])];
     foreach ($roles as $role_id => $role) {
       if (!in_array($role_id, ['anonymous'], TRUE)) {
         $role_options[$role_id] = $role->label();
@@ -112,8 +115,8 @@ class GuidedTourForm extends EntityForm {
 
     $form['routing']['roles'] = [
       '#type'          => 'checkboxes',
-      '#title'         => $this->t('Roles that see the tour'),
-      '#description'   => $this->t('Leave all unchecked to show to all roles.'),
+      '#title'         => $this->t('Roles that see the tour', [], ['context' => 'guided_tour']),
+      '#description'   => $this->t('Leave all unchecked to show to all roles.', [], ['context' => 'guided_tour']),
       '#options'       => $role_options,
       '#default_value' => $tour->getRoles(),
     ];
@@ -121,15 +124,15 @@ class GuidedTourForm extends EntityForm {
     $bundle_filter = $tour->getBundleFilter();
     $form['bundle'] = [
   '#type'  => 'details',
-  '#title' => $this->t('Filter by content type (bundle)'),
+  '#title' => $this->t('Filter by content type (bundle)', [], ['context' => 'guided_tour']),
   '#open'  => !empty($bundle_filter),
 ];
 
 $form['bundle']['bundle_entity_type'] = [
   '#type'          => 'textfield',
-  '#title'         => $this->t('Entity type'),
+  '#title'         => $this->t('Entity type', [], ['context' => 'guided_tour']),
   '#description'   => $this->t(
-    'Internal entity type machine name. Use <code>node</code> for content, <code>taxonomy_term</code> for terms, etc.'
+    'Internal entity type machine name. Use <code>node</code> for content, <code>taxonomy_term</code> for terms, etc.',[], ['context' => 'guided_tour']
   ),
   '#default_value' => $bundle_filter['entity_type'] ?? '',
   '#placeholder'   => 'node',
@@ -137,9 +140,9 @@ $form['bundle']['bundle_entity_type'] = [
 
 $form['bundle']['bundle_name'] = [
   '#type'          => 'textfield',
-  '#title'         => $this->t('Bundle'),
+  '#title'         => $this->t('Bundle', [], ['context' => 'guided_tour']),
   '#description'   => $this->t(
-    'Machine name of the bundle. E.g. <code>course</code>, <code>article</code>, <code>tags</code>.'
+    'Machine name of the bundle. E.g. <code>course</code>, <code>article</code>, <code>tags</code>.',[], ['context' => 'guided_tour']
   ),
   '#default_value' => $bundle_filter['bundle'] ?? '',
   '#placeholder'   => 'course',
@@ -153,14 +156,14 @@ $form['bundle']['bundle_name'] = [
     // ── Opciones de comportamiento ─────────────────────────────────────────
     $form['behavior'] = [
       '#type'  => 'details',
-      '#title' => $this->t('Behavior'),
+      '#title' => $this->t('Behavior', [], ['context' => 'guided_tour']),
       '#open'  => TRUE,
     ];
 
     $form['behavior']['cookie_days'] = [
       '#type'          => 'number',
-      '#title'         => $this->t('Dismissal days'),
-      '#description'   => $this->t('How many days to remember that the user has seen the tour (cookie). Use 0 to not remember.'),
+      '#title'         => $this->t('Dismissal days', [], ['context' => 'guided_tour']),
+      '#description'   => $this->t('How many days to remember that the user has seen the tour (cookie). Use 0 to not remember.', [], ['context' => 'guided_tour']),
       '#default_value' => $tour->getCookieDays(),
       '#min'           => 0,
       '#max'           => 3650,
@@ -168,31 +171,33 @@ $form['bundle']['bundle_name'] = [
 
     $form['behavior']['wait_for_wc'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Wait for Web Components'),
-      '#description'   => $this->t('Activate if your elements are Web Components (Storybook/Lit). The tour will wait for them to upgrade before starting.'),
+      '#title'         => $this->t('Wait for Web Components', [], ['context' => 'guided_tour']),
+      '#description'   => $this->t('Activate if your elements are Web Components (Storybook/Lit). The tour will wait for them to upgrade before starting.', [], ['context' => 'guided_tour']),
       '#default_value' => $tour->isWaitForWc(),
     ];
 
     $options = $tour->getOptions();
     $form['behavior']['use_modal_overlay'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Use dark overlay'),
-      '#description'   => $this->t('Shows a semi-transparent overlay highlighting the active element.'),
+      '#title'         => $this->t('Use dark overlay', [], ['context' => 'guided_tour']),
+      '#description'   => $this->t('Shows a semi-transparent overlay highlighting the active element.', [], ['context' => 'guided_tour']),
       '#default_value' => $options['useModalOverlay'] ?? TRUE,
     ];
 
     // ── Pasos del tour ─────────────────────────────────────────────────────
     $form['steps_wrapper'] = [
       '#type'  => 'details',
-      '#title' => $this->t('Steps of the tour'),
+      '#title' => $this->t('Steps of the tour', [], ['context' => 'guided_tour']),
       '#open'  => TRUE,
     ];
 
     $form['steps_wrapper']['steps_yaml'] = [
       '#type'          => 'textarea',
-      '#title'         => $this->t('Steps (YAML format)'),
+      '#title'         => $this->t('Steps (YAML format)', [], ['context' => 'guided_tour']),
       '#description'   => $this->t(
-        'Define the steps in YAML. Each step supports: <code>id</code>, <code>title</code>, <code>text</code>, <code>attachTo</code> (element + on), <code>buttons</code> (type: next/back/cancel). <a href="#yaml-help">View example</a>.'
+        'Define the steps in YAML. Each step supports: <code>id</code>, <code>title</code>, <code>text</code>, <code>attachTo</code> (element + on), <code>buttons</code> (type: next/back/cancel). <a href="#yaml-help">View example</a>.',
+        [],
+        ['context' => 'guided_tour']
       ),
       '#default_value' => $this->stepsToYaml($tour->getSteps()),
       '#rows'          => 20,
@@ -202,7 +207,7 @@ $form['bundle']['bundle_name'] = [
     // Ejemplo colapsado como referencia rápida.
     $form['steps_wrapper']['yaml_help'] = [
       '#type'   => 'details',
-      '#title'  => $this->t('YAML Steps Example'),
+      '#title'  => $this->t('YAML Steps Example', [], ['context' => 'guided_tour']),
       '#open'   => FALSE,
       '#id'     => 'yaml-help',
       'example' => [
@@ -228,11 +233,11 @@ $form['bundle']['bundle_name'] = [
       try {
         $parsed = Yaml::parse($yaml);
         if (!is_array($parsed)) {
-          $form_state->setErrorByName('steps_yaml', $this->t('The YAML must be a list of steps.'));
+          $form_state->setErrorByName('steps_yaml', $this->t('The YAML must be a list of steps.', [], ['context' => 'guided_tour']));
         }
       }
       catch (ParseException $e) {
-        $form_state->setErrorByName('steps_yaml', $this->t('Invalid YAML: @error', ['@error' => $e->getMessage()]));
+        $form_state->setErrorByName('steps_yaml', $this->t('Invalid YAML: @error', ['@error' => $e->getMessage()], ['context' => 'guided_tour']));
       }
     }
 
@@ -246,7 +251,7 @@ $form['bundle']['bundle_name'] = [
         $form_state->setErrorByName(
           'route_params',
           $this->t('Invalid parameters: @error',
-          ['@error' => $e->getMessage()]));
+          ['@error' => $e->getMessage()], ['context' => 'guided_tour']));
       }
     }
   }
@@ -294,8 +299,8 @@ $form['bundle']['bundle_name'] = [
 
     $this->messenger()->addStatus(
       $status === SAVED_NEW
-        ? $this->t('Tour <em>@label</em> created successfully.', ['@label' => $tour->label()])
-        : $this->t('Tour <em>@label</em> updated successfully.', ['@label' => $tour->label()])
+        ? $this->t('Tour <em>@label</em> created successfully.', ['@label' => $tour->label()], ['context' => 'guided_tour'])
+        : $this->t('Tour <em>@label</em> updated successfully.', ['@label' => $tour->label()], ['context' => 'guided_tour'])
     );
 
     $form_state->setRedirectUrl($tour->toUrl('collection'));

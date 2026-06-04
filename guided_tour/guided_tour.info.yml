@@ -13,3 +13,6 @@ optional:
 version: '1.0.1'
 project: 'guided_tour'
 datestamp: 1778365396
+
+'interface translation project': guided_tour
+'interface translation server pattern': translations/%project.%language.po
