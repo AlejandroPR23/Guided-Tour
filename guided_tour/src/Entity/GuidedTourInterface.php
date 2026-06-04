@@ -7,42 +7,50 @@ namespace Drupal\guided_tour\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Interface para la entidad GuidedTour.
+ * Interface for the GuidedTour entity.
  */
 interface GuidedTourInterface extends ConfigEntityInterface {
 
   /**
-   * Retorna las rutas para las que este tour es aplicable.
+   * Returns the routes for which this tour is applicable.
    */
   public function getRoutes(): array;
 
   /**
-   * Retorna los parámetros de ruta para los que este tour es aplicable.
+   * Returns the route parameters for which this tour is applicable.
    */
   public function getRouteParams(): array;
 
   /**
-   * Retorna los roles para los que este tour es aplicable.
+   * Returns the bundle filter for which this tour is applicable.
+   *
+   * @return array
+   *   Array with keys 'entity_type' and 'bundle', or empty if no filter is set.
+   */
+  public function getBundleFilter(): array;
+
+  /**
+   * Returns the roles for which this tour is applicable.
    */
   public function getRoles(): array;
 
   /**
-   * Retorna el número de días que se almacenará la cookie para este tour.
+   * Returns the number of days for which the cookie will be stored for this tour.
    */
   public function getCookieDays(): int;
 
   /**
-   * Retorna si el tour debe esperar a que el WC esté listo antes de iniciarse.
+   * Returns whether the tour should wait for the WC to be ready before starting.
    */
   public function isWaitForWc(): bool;
 
   /**
-   * Retorna las opciones de configuración para este tour.
+   * Returns the configuration options for this tour.
    */
   public function getOptions(): array;
 
   /**
-   * Retorna los pasos definidos para este tour.
+   * Returns the steps defined for this tour.
    */
   public function getSteps(): array;
 

@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\guided_tour\Plugin\Block;
 
-use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Bloque con un botón para relanzar el tour de la página actual.
+ * Block with a button to relaunch the current page's tour.
  *
- * Colócalo en cualquier región del tema (header, sidebar, footer…).
- * Solo aparece en las páginas donde hay un tour configurado.
+ * @Block(
+ *   id = "guided_tour_trigger",
+ *   admin_label = @Translation("Guided Tour Trigger"),
+ *   category = @Translation("Guided Tour"),
+ * )
  */
-#[Block(
-  id: 'guided_tour_trigger',
-  admin_label: new TranslatableMarkup('Botón de tour guiado'),
-  category: new TranslatableMarkup('Guided Tour'),
-)]
 class TourTriggerBlock extends BlockBase {
 
   /**
@@ -27,7 +23,7 @@ class TourTriggerBlock extends BlockBase {
    */
   public function defaultConfiguration(): array {
     return [
-      'button_label' => '¿Necesitas ayuda? Ver tour',
+      'button_label' => 'Need help? Take the tour!',
       'button_style' => 'button',
       'icon'         => TRUE,
     ] + parent::defaultConfiguration();
@@ -42,25 +38,26 @@ class TourTriggerBlock extends BlockBase {
 
     $form['button_label'] = [
       '#type'          => 'textfield',
-      '#title'         => $this->t('Texto del botón'),
+      '#title'         => $this->t('Button text', [], ['context' => 'guided_tour']),
       '#default_value' => $config['button_label'],
       '#required'      => TRUE,
     ];
 
     $form['button_style'] = [
       '#type'          => 'select',
-      '#title'         => $this->t('Estilo visual'),
+      '#title'         => $this->t('Visual style', [], ['context' => 'guided_tour']),
       '#options'       => [
-        'button' => $this->t('Botón primario'),
-        'link'   => $this->t('Enlace'),
-        'fab'    => $this->t('Botón flotante (FAB)'),
+        'button' => $this->t('Primary button', [], ['context' => 'guided_tour']),
+        'link'   => $this->t('Link', [], ['context' => 'guided_tour']),
+        'fab-derecha'    => $this->t('Floating action button (FAB)', [], ['context' => 'guided_tour']),
+        'fab-izquierda'  => $this->t('Floating action button (FAB) - left', [], ['context' => 'guided_tour']),
       ],
       '#default_value' => $config['button_style'],
     ];
 
     $form['icon'] = [
       '#type'          => 'checkbox',
-      '#title'         => $this->t('Mostrar icono de ayuda'),
+      '#title'         => $this->t('Show icon of question mark', [], ['context' => 'guided_tour']),
       '#default_value' => $config['icon'],
     ];
 
@@ -79,9 +76,9 @@ class TourTriggerBlock extends BlockBase {
   /**
    * {@inheritdoc}
    *
-   * El bloque solo se renderiza cuando drupalSettings.guidedTour existe,
-   * es decir cuando hay un tour activo para esta página y usuario.
-   * El JS se encarga de mostrarlo/ocultarlo según corresponda.
+   * The block is only rendered when drupalSettings.guidedTour exists,
+   * i.e. when there is an active tour for this page and user.
+   * The JS handles showing/hiding it as appropriate.
    */
   public function build(): array {
     $config = $this->configuration;
@@ -89,11 +86,16 @@ class TourTriggerBlock extends BlockBase {
     $label  = $config['button_label'];
     $icon   = $config['icon'] ? '<span class="guided-tour-trigger__icon" aria-hidden="true">?</span>' : '';
 
+    $classes = ['guided-tour-trigger', 'guided-tour-trigger--' . $style];
+    if (str_starts_with($style, 'fab')) {
+      $classes[] = 'guided-tour-trigger--fab';
+    }
+
     return [
       '#type'       => 'html_tag',
       '#tag'        => 'div',
       '#attributes' => [
-        'class'           => ['guided-tour-trigger', 'guided-tour-trigger--' . $style],
+        'class'           => $classes,
         'id'              => 'guided-tour-trigger',
         'style'           => 'display: none;',
         'aria-hidden'     => 'true',

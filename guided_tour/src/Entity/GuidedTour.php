@@ -7,17 +7,17 @@ namespace Drupal\guided_tour\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
- * Config Entity para tours guiados.
+ * Config Entity for guided tours.
  *
  * @ConfigEntityType(
  *   id = "guided_tour",
- *   label = @Translation("Tour guiado"),
- *   label_collection = @Translation("Tours guiados"),
- *   label_singular = @Translation("tour guiado"),
- *   label_plural = @Translation("tours guiados"),
+ *   label = @Translation("Guided Tour"),
+ *   label_collection = @Translation("Guided Tours"),
+ *   label_singular = @Translation("guided tour"),
+ *   label_plural = @Translation("guided tours"),
  *   label_count = @PluralTranslation(
- *     singular = "@count tour guiado",
- *     plural = "@count tours guiados",
+ *     singular = "@count guided tour",
+ *     plural = "@count guided tours",
  *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\guided_tour\GuidedTourListBuilder",
@@ -28,6 +28,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     },
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
+ *    "config_translation" = {
+ *       "mapper" = "Drupal\config_translation\ConfigEntityMapper",
  *     },
  *   },
  *   config_prefix = "tour",
@@ -43,6 +46,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "status",
  *     "routes",
  *     "route_params",
+ *     "bundle_filter",
  *     "roles",
  *     "cookie_days",
  *     "wait_for_wc",
@@ -54,99 +58,124 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "add-form"      = "/admin/config/user-interface/guided-tour/add",
  *     "edit-form"     = "/admin/config/user-interface/guided-tour/{guided_tour}/edit",
  *     "delete-form"   = "/admin/config/user-interface/guided-tour/{guided_tour}/delete",
+ *     "drupal:config-translation-overview" = "/admin/config/user-interface/guided-tour/{guided_tour}/translate",
+ *     "drupal:config-translation-add"      = "/admin/config/user-interface/guided-tour/{guided_tour}/translate/{langcode}/add",
+ *     "drupal:config-translation-edit"     = "/admin/config/user-interface/guided-tour/{guided_tour}/translate/{langcode}/edit",
+ *     "drupal:config-translation-delete"   = "/admin/config/user-interface/guided-tour/{guided_tour}/translate/{langcode}/delete",
  *   }
  * )
  */
 class GuidedTour extends ConfigEntityBase implements GuidedTourInterface {
   /**
-   * ID del tour, machine name.
+   * Tour ID, machine name.
    *
-   * @var array Rutas de Drupal donde aplica el tour */
+   * @var array Drupal routes where the tour applies
+   */
   protected array $routes = [];
 
   /**
-   * Parametros de ruta para identificar páginas específicas (ej: node/2707)
+   * Route parameters to identify specific pages (e.g. node/2707).
    *
-   * @var array Parmetros de ruta (ej: ['node' > '2707']) */
+   * @var array Route parameters (eg ['node' > '2707'])
+   */
   protected array $route_params = [];
 
   /**
-   * Roles que ven el tour.
+   * Aditional filter to specify the bundle for which this tour applies (e.g. content type).
    *
-   * @var array Roles que ven el tour Vaco  todos */
+   * @var array
+   */
+  protected array $bundle_filter = [];
+
+  /**
+   * Roles that see the tour.
+   *
+   * @var array Roles that see the tour Empty  everyone
+   */
   protected array $roles = [];
 
   /**
-   * Número de días que se almacenará la cookie para este tour.
+   * Number of days the cookie for this tour will be stored.
    *
-   * @var int das que se recuerda el dismissal via cookie */
+   * @var int Days the dismissal is remembered via cookie
+   */
   protected int $cookie_days = 365;
 
   /**
-   * Esperar a que los Web Components hagan upgrade antes de iniciar el tour.
+   * Wait for Web Components to upgrade before starting the tour.
    *
-   * @var bool Esperar a que los Web Components hagan upgrade */
+   * @var bool Wait for Web Components to upgrade
+   */
   protected bool $wait_for_wc = TRUE;
 
   /**
-   * Opciones globales de Shepherd (useModalOverlay, etc)
+   * Global Driver.js options (useModalOverlay, etc.)
    *
-   * @var array Opciones globales de Shepherd (useModalOverlay, etc) */
+   * @var array Global Driverjs options (useModalOverlay, etc)
+   */
   protected array $options = ['useModalOverlay' => TRUE];
 
   /**
-   * Pasos del tour.
+   * Tour steps.
    *
-   * @var array Pasos del tour */
+   * @var array Tour steps
+   */
   protected array $steps = [];
 
   /**
-   * ── Getters ────────────────────────────────────────────────────────────────
+   * {@inheritdoc}
    */
   public function getRoutes(): array {
     return $this->routes;
   }
 
   /**
-   * Retorna los parámetros de ruta para los que este tour es aplicable.
+   * Returns the route parameters for which this tour is applicable.
    */
   public function getRouteParams(): array {
     return $this->route_params;
   }
 
   /**
-   * Retorna los roles a los que se les mostrará este tour.
+   * Returns the roles for which this tour is applicable.
    */
   public function getRoles(): array {
     return $this->roles;
   }
 
   /**
-   * Retorna el número de días que se almacenará la cookie para este tour.
+   * Returns the number of days for which the cookie will be stored for this tour.
    */
   public function getCookieDays(): int {
     return $this->cookie_days;
   }
 
   /**
-   * Retorna si se debe esperar a que los Web Components hagan upgrade.
+   * Returns whether the tour should wait for the WC to be ready before starting.
    */
   public function isWaitForWc(): bool {
     return $this->wait_for_wc;
   }
 
   /**
-   * Retorna las opciones globales de Shepherd para este tour.
+   * Returns the configuration options for this tour.
    */
   public function getOptions(): array {
     return $this->options;
   }
 
   /**
-   * Retorna los pasos del tour.
+   * Returns the tour steps.
    */
   public function getSteps(): array {
     return $this->steps;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleFilter(): array {
+    return $this->bundle_filter;
   }
 
 }

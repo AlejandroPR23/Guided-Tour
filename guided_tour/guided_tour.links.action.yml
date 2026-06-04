@@ -1,5 +1,5 @@
 guided_tour.add:
   route_name: entity.guided_tour.add_form
-  title: 'Agregar tour guiado'
+  title: 'Add guided tour'
   appears_on:
     - entity.guided_tour.collection

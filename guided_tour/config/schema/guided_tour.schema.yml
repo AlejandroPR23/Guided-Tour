@@ -1,0 +1,86 @@
+guided_tour.tour.*:
+  type: config_entity
+  label: 'Tour guiado'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Nombre'
+    status:
+      type: boolean
+      label: 'Habilitado'
+    routes:
+      type: sequence
+      label: 'Rutas'
+      sequence:
+        type: string
+    route_params:
+      type: mapping
+      label: 'Parámetros de ruta'
+    bundle_filter:
+      type: mapping
+      label: 'Bundle filter'
+      mapping:
+        entity_type:
+          type: string
+          label: 'Entity type'
+        bundle:
+          type: string
+          label: 'Bundle (content type)'
+    roles:
+      type: sequence
+      label: 'Roles'
+      sequence:
+        type: string
+    cookie_days:
+      type: integer
+      label: 'Días de cookie'
+    wait_for_wc:
+      type: boolean
+      label: 'Esperar Web Components'
+    options:
+      type: mapping
+      label: 'Opciones de Driver.js'
+      mapping:
+        useModalOverlay:
+          type: boolean
+          label: 'Usar overlay'
+    steps:
+      type: sequence
+      label: 'Pasos'
+      sequence:
+        type: mapping
+        label: 'Paso'
+        mapping:
+          id:
+            type: string
+            label: 'ID del paso'
+          title:
+            type: label        # ← traducible
+            label: 'Título'
+          text:
+            type: text         # ← traducible
+            label: 'Texto'
+          attachTo:
+            type: mapping
+            label: 'Adjuntar a'
+            mapping:
+              element:
+                type: string
+              on:
+                type: string
+          buttons:
+            type: sequence
+            label: 'Botones'
+            sequence:
+              type: mapping
+              label: 'Botón'
+              mapping:
+                text:
+                  type: label  # ← traducible
+                  label: 'Texto del botón'
+                type:
+                  type: string
+                  label: 'Tipo'

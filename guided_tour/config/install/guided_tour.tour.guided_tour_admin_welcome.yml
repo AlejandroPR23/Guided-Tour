@@ -1,0 +1,130 @@
+id: guided_tour_admin_welcome
+label: 'How to use Guided Tour — Tour list'
+status: true
+
+routes:
+  - entity.guided_tour.collection
+
+roles:
+  - administrator
+
+cookie_days: 365
+wait_for_wc: false
+
+options:
+  useModalOverlay: true
+
+steps:
+  - id: step-welcome
+    title: 'Welcome to Guided Tour'
+    text: "<p>This module lets you create <strong>step-by-step tours</strong> for any page of your Drupal site using Driver.js.</p><p>This short tour will walk you through the admin interface so you can start creating tours right away.</p>"
+    buttons:
+      - text: 'Start'
+        type: next
+      - text: 'Skip'
+        type: cancel
+
+  - id: step-add-button
+    title: 'Create a new tour'
+    text: "<p>Click <strong>Add guided tour</strong> to open the creation form.</p><p>Each tour targets one or more Drupal routes and one or more user roles. You can have as many tours as you need — one per audience, one per page, or one per content type.</p>"
+    attachTo:
+      element: '[data-tour="add-tour-btn"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-table
+    title: 'Tour list'
+    text: "<p>Every tour you create appears here as a row. You can see at a glance which routes and roles each tour targets, and whether it is currently active.</p>"
+    attachTo:
+      element: '[data-tour="guided-tour-list"]'
+      on: top
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-col-label
+    title: 'Name and ID'
+    text: "<p>The <strong>Name</strong> is the human-readable label you give the tour — visible only to administrators.</p><p>The <strong>ID</strong> is the machine name used internally, in config exports (<code>guided_tour.tour.my_id.yml</code>) and as part of the dismissal cookie name.</p>"
+    attachTo:
+      element: '[data-tour="col-label"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-col-routes
+    title: 'Routes column'
+    text: "<p>Shows which Drupal route names trigger this tour. <strong>All</strong> means no route filter is set — the tour can appear on any page, filtered later by role and dismissal cookie.</p><p>Examples of route names: <code>&lt;front&gt;</code>, <code>entity.node.canonical</code>, <code>view.dashboard.page_1</code>.</p>"
+    attachTo:
+      element: '[data-tour="col-routes"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-col-roles
+    title: 'Roles column'
+    text: "<p>Shows which user roles will see this tour. <strong>All</strong> means every role including anonymous users.</p><p>If you restrict it to e.g. <code>editor</code>, only users with that role will ever see the tour — even if the route matches for other users.</p>"
+    attachTo:
+      element: '[data-tour="col-roles"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-col-status
+    title: 'Status column'
+    text: "<p><strong>Enabled</strong> tours are active and will be shown to matching users.</p><p><strong>Disabled</strong> tours are saved in the system but never shown — useful for tours you are still writing, or seasonal tours you want to keep but not display right now.</p>"
+    attachTo:
+      element: '[data-tour="col-status"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-operations
+    title: 'Edit and delete'
+    text: "<p>Use the <strong>Edit</strong> link to modify any tour at any time — update steps, change routes, enable or disable it.</p><p>Use <strong>Delete</strong> to permanently remove a tour. This action cannot be undone, but since tours are config entities you can always restore them from a config export.</p>"
+    attachTo:
+      element: '[data-tour="col-operations"]'
+      on: left
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-replay-block
+    title: 'Replay button for your users'
+    text: "<p>Once you have tours set up, you can give users a way to relaunch them at any time.</p><p>Go to <strong>Structure → Block layout</strong>, search for <strong>Guided Tour Trigger</strong> and place it in any region. It will only appear on pages where a tour is active for the current user.</p>"
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-done
+    title: 'Ready to create your first tour'
+    text: "<p>Click <strong>Add guided tour</strong> to get started. A second tour will guide you through the creation form step by step.</p><p>You can relaunch this tour at any time using the help button if you placed the Guided Tour Trigger block.</p>"
+    attachTo:
+      element: '[data-tour="add-tour-btn"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Finish'
+        type: next

@@ -1,0 +1,184 @@
+id: guided_tour_admin_form
+label: 'How to use Guided Tour — Create/Edit form'
+status: true
+
+routes:
+  - entity.guided_tour.add_form
+
+roles:
+  - administrator
+
+cookie_days: 365
+wait_for_wc: false
+
+options:
+  useModalOverlay: true
+
+steps:
+  - id: step-label
+    title: 'Tour name'
+    text: "<p>Give your tour a descriptive <strong>internal name</strong>, visible only to administrators.</p><p>Examples: <code>Onboarding — Editor role</code>, <code>Homepage — Anonymous users</code>, <code>Course detail page — Students</code>.</p>"
+    attachTo:
+      element: '[data-tour="field-label"]'
+      on: bottom
+    buttons:
+      - text: 'Start'
+        type: next
+      - text: 'Skip'
+        type: cancel
+
+  - id: step-id
+    title: 'Machine name'
+    text: "<p>Auto-generated from the name. Used in config exports as the filename: <code>guided_tour.tour.my_id.yml</code>.</p><p>It also forms part of the dismissal cookie name, so changing it after the tour is live will make all existing cookies invalid and users will see the tour again.</p>"
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-status
+    title: 'Enable or disable'
+    text: "<p>Uncheck <strong>Enabled</strong> to save the tour without activating it. The tour will be stored in the system but never shown to any user.</p><p>Useful when you are still writing the steps or waiting for a deployment before going live.</p>"
+    attachTo:
+      element: '[data-tour="field-status"]'
+      on: right
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-routing
+    title: 'Routes — where the tour appears'
+    text: "<p>Enter one Drupal internal route name per line. The tour will only be triggered on those pages.</p><p>Examples:<br><code>&lt;front&gt;</code> — the home page<br><code>entity.node.canonical</code> — any node detail page<br><code>system.admin_content</code> — the content list<br><code>view.dashboard.page_1</code> — a specific view page</p><p>Leave empty to match <strong>all routes</strong> on the site.</p>"
+    attachTo:
+      element: '[data-tour="field-routes-drupal"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-route-params
+    title: 'Route parameters — target one exact page'
+    text: "<p>Use this to narrow the tour to a single specific page within a route. Enter one parameter per line in <code>key: value</code> format.</p><p>Example — to show the tour only on node 42:<br><code>node: 42</code></p><p>Combined with <code>entity.node.canonical</code> in routes, this will only trigger on that exact node. Leave empty to ignore parameters.</p>"
+    attachTo:
+      element: '[data-tour="field-route-params"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-roles
+    title: 'Roles — who sees the tour'
+    text: "<p>Check the roles that should see this tour.</p><p>Examples:<br>— Check <strong>anonymous</strong> for a welcome tour on the homepage.<br>— Check <strong>editor</strong> for an onboarding tour in the admin area.<br>— Check <strong>administrator</strong> for module documentation tours like this one.</p><p>Leave all unchecked to show the tour to <strong>every role</strong> that visits the matching route.</p>"
+    attachTo:
+      element: '[data-tour="field-roles"]'
+      on: right
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-bundle
+    title: 'Bundle filter — target a content type'
+    text: "<p>Optional. Restrict the tour to a specific entity type and bundle, even within a broad route like <code>entity.node.canonical</code>.</p><p>Example:<br><strong>Entity type:</strong> <code>node</code><br><strong>Bundle:</strong> <code>course</code></p><p>With this set, the tour will only appear on <em>course</em> node pages, not on articles, pages or any other type.</p>"
+    attachTo:
+      element: '[data-tour="section-bundle"]'
+      on: bottom
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-cookie-days
+    title: 'Dismissal days'
+    text: "<p>How many days to wait before showing the tour again after a user completes or skips it. The module stores a cookie in the user's browser.</p><p><code>0</code> — show on every visit, no cookie is stored<br><code>30</code> — show again after one month<br><code>365</code> — show again after one year<br><code>9999</code> — effectively show only once ever</p><p>Authenticated users get a personal cookie (includes their UID). Anonymous users share a cookie per browser.</p>"
+    attachTo:
+      element: '[data-tour="field-cookie-days"]'
+      on: right
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-wait-for-wc
+    title: 'Wait for Web Components'
+    text: "<p>Enable this if your tour targets <strong>custom elements</strong> built with Lit, Storybook or any Web Components framework — tags that contain a dash, like <code>cc-card</code>, <code>my-header</code>, <code>app-nav</code>.</p><p>When enabled, the tour waits for those elements to finish their browser upgrade cycle before starting, preventing the tour from launching before the elements exist in the DOM.</p><p>Leave unchecked for standard HTML elements like <code>div</code>, <code>button</code>, <code>input</code>.</p>"
+    attachTo:
+      element: '[data-tour="field-wait-for-wc"]'
+      on: right
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-overlay
+    title: 'Dark overlay'
+    text: "<p>When enabled, a semi-transparent dark layer covers the entire page and only the highlighted element remains fully visible.</p><p>This helps focus the user's attention on each step, especially on busy admin pages.</p><p>Disable it for a lighter experience where the tour popover appears without dimming the rest of the page.</p>"
+    attachTo:
+      element: '[data-tour="field-overlay"]'
+      on: right
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-steps-yaml
+    title: 'Tour steps — YAML editor'
+    text: "<p>Define each step of the tour in YAML format. Every step supports these fields:</p><ul><li><code>id</code> — unique identifier for the step (required)</li><li><code>title</code> — heading shown in the popover (required)</li><li><code>text</code> — body text, supports HTML (required)</li><li><code>attachTo.element</code> — CSS selector of the element to highlight (optional)</li><li><code>attachTo.on</code> — popover position: <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code> (optional)</li><li><code>buttons</code> — list of action buttons (optional)</li></ul><p>If <code>attachTo</code> is omitted, the popover appears centered on the screen.</p>"
+    attachTo:
+      element: '[data-tour="field-steps-yaml"]'
+      on: top
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-button-types
+    title: 'Button types'
+    text: "<p>Each button in a step needs two fields — <code>text</code> and <code>type</code>:</p><ul><li><code>next</code> — advances to the next step. On the last step it finishes the tour and stores the dismissal cookie.</li><li><code>back</code> — goes back to the previous step.</li><li><code>cancel</code> — closes the tour immediately and stores the dismissal cookie regardless of which step the user is on.</li></ul><p>You can use any combination of button types in any step. A step with no buttons can only be closed via the X icon.</p>"
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-shadow-dom
+    title: 'Targeting Shadow DOM elements'
+    text: "<p>If the element you want to highlight is inside a Web Component's Shadow DOM, use the piercing syntax:</p><pre>host-tag >> inner-selector</pre><p>Examples:<br><code>cc-header >> .nav-menu</code><br><code>my-card >> button.cta</code><br><code>app-layout >> [data-tour=\"main-content\"]</code></p><p>You can chain multiple levels:<br><code>outer-wc >> inner-wc >> .target</code></p><p>Make sure <strong>Wait for Web Components</strong> is enabled when using this syntax.</p>"
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-yaml-help
+    title: 'Built-in YAML reference'
+    text: "<p>Below the YAML editor you will find a collapsible <strong>YAML Steps Example</strong> section with a ready-to-copy template covering all supported fields.</p><p>Expand it any time you need a quick reminder of the syntax without leaving the form.</p>"
+    attachTo:
+      element: '#yaml-help'
+      on: top
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Next'
+        type: next
+
+  - id: step-save
+    title: 'Save and test'
+    text: "<p>Click <strong>Save</strong> at the bottom of the form. The tour becomes active immediately — no cache clear needed.</p><p>To test it, open the target page in a private/incognito window (to avoid the dismissal cookie from previous tests) and the tour should start automatically.</p><p>To force a replay without incognito mode, place the <strong>Guided Tour Trigger</strong> block — it clears the cookie and relaunches the tour on click.</p>"
+    buttons:
+      - text: 'Back'
+        type: back
+      - text: 'Finish'
+        type: next
