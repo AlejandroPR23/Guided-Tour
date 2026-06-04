@@ -51,7 +51,6 @@ function guided_tour_page_attachments(array &$attachments): void {
   }
 
   $cookie_name = 'guided_tour_dismissed_' . $tour->id();
-  $dismissed   = \Drupal::request()->cookies->has($cookie_name);
 
   $attachments['#attached']['library'][]                    = 'guided_tour/guided_tour';
   $attachments['#attached']['drupalSettings']['guidedTour'] = [
@@ -63,7 +62,6 @@ function guided_tour_page_attachments(array &$attachments): void {
     'cookieName'  => $cookie_name,
     'cookieDays'  => $tour->getCookieDays(),
     'waitForWC'   => $tour->isWaitForWc(),
-    'autoPlay'    => !$dismissed,
   ];
 }
 

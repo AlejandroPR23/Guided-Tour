@@ -168,6 +168,21 @@
     document.cookie = `${name}=${encodeURIComponent(value)}; expires=${exp}; path=/; SameSite=Lax`;
   }
 
+  function getEffectiveCookieName(baseName) {
+    const uid = drupalSettings.user && parseInt(drupalSettings.user.uid, 10) > 0
+      ? parseInt(drupalSettings.user.uid, 10)
+      : 0;
+    // Anónimos (uid=0) usan el nombre base compartido por browser.
+    // Autenticados añaden su UID → cookie personal.
+    return uid > 0 ? baseName + '_u' + uid : baseName;
+  }
+
+  function hasCookie(name) {
+    return document.cookie.split(';').some(function (c) {
+      return c.trim().startsWith(name + '=');
+    });
+  }
+
   function deleteCookie(name) {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
   }
@@ -425,18 +440,44 @@
       overlayOpacity: config.options && config.options.useModalOverlay === false ? 0 : 0.6,
       showProgress: false,
       smoothScroll,
-      stagePadding: 4,
+      stagePadding: 8,
       stageRadius: 8,
-      popoverOffset: 12,
+      popoverOffset: 34,
       steps: buildSteps(config),
+      onHighlightStarted(element) {
+        document.body.classList.add('guided-tour--transitioning');
+        if (element) {
+          element.scrollIntoView({ behavior: 'instant', block: 'center' });
+        }
+      },
       onHighlighted(element, step) {
         if (step && step.element && typeof step.element === 'string' && !document.querySelector(step.element)) {
           console.warn(`[GuidedTour] Element not found: "${step.element}"`);
         }
 
         updateGhosts();
-
         updatePopover(step);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (activeTour) {
+              activeTour.refresh();
+            }
+
+            document.body.classList.remove('guided-tour--transitioning');
+
+            const popover = document.querySelector('.driver-popover');
+            if (popover) {
+              popover.style.transition = 'opacity 0.15s ease';
+              popover.style.opacity = '1';
+
+              popover.addEventListener('transitionend', () => {
+                popover.style.transition = '';
+                popover.style.opacity = '';
+              }, { once: true });
+            }
+          });
+        });
       },
       onDestroyed() {
         const reason = activeTourFinishReason || 'cancel';
@@ -487,6 +528,12 @@
 
         if (!config || !driverFactory) return;
 
+        // Enriquecer config con el cookie name efectivo (incluye UID si autenticado)
+        const enrichedConfig = {
+          ...config,
+          cookieName: getEffectiveCookieName(config.cookieName),
+        };
+
         const startTour = async () => {
           if (activeTour) {
             activeTourFinishReason = 'restart';
@@ -496,28 +543,25 @@
 
           cleanupDriver();
 
-          if (config.waitForWC) {
-            await waitForWebComponents(config.steps);
+          if (enrichedConfig.waitForWC) {
+            await waitForWebComponents(enrichedConfig.steps);
           }
 
-          const firstSelector = config.steps[0] &&
-            config.steps[0].attachTo &&
-            config.steps[0].attachTo.element;
-
+          const firstSelector = enrichedConfig.steps[0]?.attachTo?.element;
           if (firstSelector) {
             await waitForElement(firstSelector);
           }
 
-          activeTour = createTour(config);
+          // createTour usa enrichedConfig → onDestroyed escribe la cookie correcta
+          activeTour = createTour(enrichedConfig);
           if (!activeTour) return;
 
-          setTimeout(() => {
-            activeTour.drive();
-          }, 300);
+          setTimeout(() => activeTour.drive(), 300);
         };
 
         try {
-          if (config.autoPlay) {
+          const isDismissed = enrichedConfig.cookieDays > 0 && hasCookie(enrichedConfig.cookieName);
+          if (!isDismissed) {
             await startTour();
           }
         }
@@ -525,7 +569,7 @@
           console.error('[GuidedTour] Error al iniciar tour:', e);
         }
         finally {
-          showReplayButton(config, startTour);
+          showReplayButton(enrichedConfig, startTour);
         }
       });
     },

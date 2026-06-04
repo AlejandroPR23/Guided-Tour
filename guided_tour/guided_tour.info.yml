@@ -2,9 +2,14 @@ name: Guided Tour
 type: module
 description: 'Guided tours with Driver.js for anonymous and authenticated users. Compatible with Web Components (Storybook/Lit/Tailwind).'
 package: User interface
-version: 1.0.0
+# version: 1.0.0
 core_version_requirement: ^10 || ^11
 dependencies:
   - drupal:user
 optional:
   - config_translation
+
+# Information added by Drupal.org packaging script on 2026-05-09
+version: '1.0.1'
+project: 'guided_tour'
+datestamp: 1778365396

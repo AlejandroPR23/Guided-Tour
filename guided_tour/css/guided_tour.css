@@ -66,6 +66,7 @@
 }
 
 @keyframes gt-pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -225,6 +226,7 @@
 }
 
 .driver-popover.guided-tour__popover .driver-popover-arrow {
+  display: none !important;
   border-width: 25px !important;
 }
 
@@ -246,11 +248,11 @@
 
 /* Sombra sutil para que la flecha destaque sobre fondos oscuros */
 .driver-popover.guided-tour__popover .driver-popover-arrow-side-top {
-  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.12)) !important;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.12)) !important;
 }
 
 .driver-popover.guided-tour__popover .driver-popover-arrow-side-bottom {
-  filter: drop-shadow(0 -3px 3px rgba(0,0,0,0.12)) !important;
+  filter: drop-shadow(0 -3px 3px rgba(0, 0, 0, 0.12)) !important;
 }
 
 
@@ -349,4 +351,12 @@
 .guided-tour-trigger__icon {
   font-style: normal !important;
   font-weight: 700 !important;
+}
+
+/* Visual helpers */
+
+.guided-tour--transitioning .driver-popover {
+  opacity: 0 !important;
+  transition: none !important;
+  pointer-events: none !important;
 }

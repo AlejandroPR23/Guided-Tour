@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\guided_tour\Plugin\Block;
 
-use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Block with a button to relaunch the current page's tour.
  *
- * Place it in any theme region (header, sidebar, footer…).
- * Only appears on pages where a tour is configured.
+ * @Block(
+ *   id = "guided_tour_trigger",
+ *   admin_label = @Translation("Guided Tour Trigger"),
+ *   category = @Translation("Guided Tour"),
+ * )
  */
-#[Block(
-  id: 'guided_tour_trigger',
-  admin_label: new TranslatableMarkup('Guided Tour Trigger'),
-  category: new TranslatableMarkup('Guided Tour'),
-)]
 class TourTriggerBlock extends BlockBase {
 
   /**
